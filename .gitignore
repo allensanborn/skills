@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+# local, per-project skill config (documented via .c4-diagrams.example.json)
+.c4-diagrams.json
+# eval run artifacts
+**/evals/runs/
+**/exports/

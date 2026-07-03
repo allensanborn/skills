@@ -1,0 +1,66 @@
+{
+  "skill_name": "drawing-c4-diagrams",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a web app: a React SPA, a Spring Boot API, and a Postgres database. Customers use it; it also emails them via our SMTP server. Draw the C4 diagrams.",
+      "expected_behavior": [
+        "Runs the pre-generation scoping grill (audience, system-in-scope, actors, external systems, level) before emitting DSL",
+        "Produces valid Structurizr DSL with one model and System Context + Container views",
+        "Classifies the SPA/API/DB as C4 containers with technologies, and the SMTP/email as an external software system",
+        "Validates the DSL and offers a Mermaid preview"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Here's a photo of my whiteboard. Turn it into a diagram.",
+      "expected_behavior": [
+        "Assesses image complexity and asks whether the user wants one-pass or a grilled conversion",
+        "For a simple image, offers one-pass; for a complex one, strongly encourages the grill",
+        "Runs the interpretation grill and rejects silent Docker-container-vs-C4-container / infra-vs-software-system mis-mapping",
+        "Builds the model one C4 level at a time"
+      ],
+      "files": ["fixtures/README.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "Draw a container diagram for our system (no other detail given).",
+      "expected_behavior": [
+        "Does NOT invent scope; grills for audience, boundary, actors, and externals first",
+        "Refuses to proceed to DSL until the scoping questions are answered"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Here's some Structurizr DSL I wrote but it won't render. Fix it. [DSL with a syntax error]",
+      "expected_behavior": [
+        "Validates via the Structurizr MCP tools",
+        "Runs a validate -> fix -> re-validate loop until the DSL parses",
+        "Explains what was wrong in C4 terms, not just syntax"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Skip the grill, just give me container-diagram DSL for a two-service system with a queue between them.",
+      "expected_behavior": [
+        "Still runs the hard-to-skip pre-generation scoping essentials",
+        "Honors 'skip the grill' for the POST-generation review only",
+        "Produces valid DSL with the queue modelled as a container with a technology"
+      ],
+      "files": []
+    }
+  ],
+  "trigger_evals": [
+    { "query": "draw the architecture of my app", "should_trigger": true },
+    { "query": "make a C4 container diagram", "should_trigger": true },
+    { "query": "turn this whiteboard photo into a diagram", "should_trigger": true },
+    { "query": "write me a Structurizr DSL workspace", "should_trigger": true },
+    { "query": "document our system architecture visually", "should_trigger": true },
+    { "query": "draw a sequence diagram of this function", "should_trigger": false },
+    { "query": "make a bar chart of these sales numbers", "should_trigger": false },
+    { "query": "diagram this database ER schema", "should_trigger": false }
+  ]
+}
