@@ -73,7 +73,10 @@ people." Do not proceed to DSL until these are answered.
 
 Write or extend `workspace.dsl` following [references/structurizr-dsl.md](references/structurizr-dsl.md).
 Build the model **one C4 level at a time** (System Context → Containers → Components);
-render many views from the one model.
+render many views from the one model. For common architectures (SPA+API+DB, message
+queues, microservices, external SaaS, serverless) and the DSL features that express them
+cleanly — plus the modeling errors to catch — use
+[references/patterns-and-pitfalls.md](references/patterns-and-pitfalls.md).
 
 **If the user pastes an image**, follow [references/image-to-dsl.md](references/image-to-dsl.md):
 assess its complexity and ask whether they want a one-pass conversion or to be grilled.
@@ -117,6 +120,7 @@ Finally, export the finished views (Mermaid/PlantUML via MCP, or PNG/SVG via Lit
 
 - [references/c4-model.md](references/c4-model.md) — the C4 model itself: abstractions, the four levels, supplementary diagrams, notation.
 - [references/structurizr-dsl.md](references/structurizr-dsl.md) — how to write correct Structurizr DSL.
+- [references/patterns-and-pitfalls.md](references/patterns-and-pitfalls.md) — modeling patterns for common architectures, DSL cookbook features, and errors to catch.
 - [references/runtime-and-mcp.md](references/runtime-and-mcp.md) — setup flow, the MCP inner loop, and the Lite render loop.
 - [references/image-to-dsl.md](references/image-to-dsl.md) — turning a pasted image into DSL (one-pass vs grilled, level-by-level).
 - [references/grill-questions.md](references/grill-questions.md) — the two-phase Socratic question bank.
