@@ -6,3 +6,9 @@ node_modules/
 # eval run artifacts
 **/evals/runs/
 **/exports/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
