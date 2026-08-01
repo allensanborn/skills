@@ -93,8 +93,10 @@ user (validator → fix → repeat):
 - Export a **Mermaid** view for an inline preview (renders in chat/Markdown, no browser).
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
-fallbacks. At Tier 0 (no MCP), validate by careful reading and give the user the DSL plus
-a Mermaid export to paste into the playground.
+fallbacks. If Docker is present but MCP is not connected, use the **headless `structurizr/structurizr
+export`** command as the inner loop — a failed export (parser exception / non-zero exit) is your
+validation signal. At Tier 0 (no Docker), validate by careful reading and give the user the DSL
+plus a Mermaid export to paste into the playground.
 
 ## 4. RENDER — the outer loop (optional)
 
@@ -113,8 +115,11 @@ externals and omitted technology. Length scales with the diagram, not a fixed co
 This grill **is skippable**: if the user says "skip the grill" (or set it off in config),
 skip straight to export. It is on by default.
 
-Finally, export the finished views (Mermaid/PlantUML via MCP, or PNG/SVG via Lite) into
-`<configured-dir>/exports/` and tell the user where they are.
+Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
+they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in Lite, or **headlessly via
+`structurizr/structurizr export`** (DSL → Mermaid/PlantUML, then rasterise PlantUML → PNG/SVG;
+see [references/runtime-and-mcp.md](references/runtime-and-mcp.md)). For diagrams committed to a
+repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
 
 ## References
 

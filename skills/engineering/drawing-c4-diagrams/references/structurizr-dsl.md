@@ -78,6 +78,28 @@ technology/protocol where it matters.
     api -> email "Sends e-mail using" "SMTP"
 ```
 
+**Tagging a relationship** (to style or filter it later — e.g. async, telemetry, feature
+flags): the tag is the **5th positional argument**, after description and technology:
+
+```
+    api -> broker "Publishes OrderPlaced to" "Kafka" "Async"
+```
+
+Do **not** put a `{ tags "Async" }` block on the *same line* as the relationship — the parser
+rejects it with `Too many tokens, expected: <identifier> -> <identifier> [description]
+[technology] [tags]`. Use the positional form above, or move the block onto its own lines:
+
+```
+    api -> broker "Publishes OrderPlaced to" "Kafka" {
+        tags "Async"
+    }
+```
+
+The same one-line-brace trap applies to **elements**: `softwareSystem "X" { tags "Platform" }` on a
+single line fails the same way. Tags is the last positional argument — `softwareSystem "Name"
+"Description" "Tag"` (person/softwareSystem) or `container "Name" "Description" "Technology" "Tag"` —
+or put a `{ tags "..." }` block on its **own lines**.
+
 ## Views
 
 Render one view per level. `include *` pulls in the relevant elements; always set
