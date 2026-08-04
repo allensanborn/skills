@@ -6,12 +6,17 @@ This skill uses local Structurizr runtimes with different jobs:
   Mermaid/PlantUML. Fast, no browser.
 - **Structurizr Lite** — the human's **outer loop**: render real C4 diagrams and edit
   layout in a browser at `http://localhost:8080`.
-- **Structurizr CLI** (`export` subcommand) — a **headless** inner-loop fallback when MCP is
-  not connected: validate the DSL and export Mermaid/PlantUML with no browser and no MCP
-  server (then rasterise to PNG/SVG). See [Headless export](#headless-export-no-mcp-no-browser).
+- **Structurizr CLI** (`export` / `inspect` / `generate` subcommands) — the **headless
+  workhorse** and the **practical default whenever Docker is present**: validate (a failed
+  `export` is the parse signal), export Mermaid/PlantUML → rasterise to PNG/SVG, `inspect` (model
+  lint), `generate system-landscape`. No MCP server, no browser. See
+  [Headless export](#headless-export-no-mcp-no-browser).
 
-All are optional. Work at the highest tier the environment supports and degrade
-gracefully — **never assume Docker is installed**.
+All are optional, but note the shape: **with Docker, the headless CLI is the baseline**
+(validate + render images + inspect + generate); **MCP and Lite are enhancements on top** (a
+faster in-chat loop, and interactive layout). Work at the highest tier the environment supports
+and degrade gracefully — **never assume Docker is installed**, and **don't assume MCP** just
+because Docker is there.
 
 > **Use the consolidated `structurizr/structurizr` image for both Lite and the CLI**
 > (`structurizr/structurizr local` and `structurizr/structurizr export ...`). The older

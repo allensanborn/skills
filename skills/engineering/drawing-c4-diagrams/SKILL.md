@@ -34,9 +34,9 @@ tool is installed.
 
 | Tier | Needs | You can |
 | --- | --- | --- |
-| **0 — always** | nothing | author + validate DSL by eye, export **Mermaid** as text, tell the user to paste it into the structurizr.com/dsl playground |
-| **1 — +MCP** | Docker (or the public server) | validate/parse DSL and export Mermaid/PlantUML programmatically — the fast inner loop |
-| **2 — +Lite** | Docker + a browser | render real C4 diagrams and edit layout at `http://localhost:8080` |
+| **0 — always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the structurizr.com/dsl playground |
+| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: validate (a failed `export` is your parse signal), render **PNG/SVG** (export → PlantUML), `inspect` (model lint), `generate system-landscape`. **No MCP or browser required.** |
+| **2 — +MCP and/or browser** | Docker + MCP / a browser | **MCP**: fast in-chat validate + Mermaid/PlantUML preview (inner loop). **Lite** (`structurizr/structurizr local`): interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
 
 On first use, look for the config file `.c4-diagrams.json` at the repo root. If it is
 missing, run the **setup flow** in [references/runtime-and-mcp.md](references/runtime-and-mcp.md):
