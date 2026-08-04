@@ -99,6 +99,9 @@ user (validator → fix → repeat):
 - **Verify each view isn't empty.** Parsing OK ≠ view correct — a misscoped `include`/`exclude`
   renders **0 elements**. Check the per-view element/relationship counts (from the exported
   `workspace.json`) before moving on.
+- If Docker is present, run **`structurizr inspect`** for the model-completeness lint (missing
+  descriptions/technology, orphans, elements on no view, empty views) — no server needed; see
+  [references/diagram-review-checklist.md](references/diagram-review-checklist.md) (*Inspections*).
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
 fallbacks. If Docker is present but MCP is not connected, use the **headless `structurizr/structurizr

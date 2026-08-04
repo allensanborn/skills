@@ -101,9 +101,32 @@ the review, not optional.
       render as intended in the format you're shipping? PlantUML and Mermaid style differently,
       and a generated workspace has **no theme** unless you add one.
 
-For model-completeness lint (missing descriptions/technology, elements in no view, etc.), see the
-Structurizr Inspections list; the DSL-level fixes for scoping problems are in
-[structurizr-dsl.md](structurizr-dsl.md) (*View contents*).
+The DSL-level fixes for scoping problems are in [structurizr-dsl.md](structurizr-dsl.md)
+(*View contents*); the machine-checkable model-completeness lint is **Inspections**, below.
+
+## Inspections — the automatable lint
+
+Structurizr ships an enumerated model lint ([docs](https://docs.structurizr.com/workspaces/inspections)).
+**Run it locally — no server, no license:**
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr inspect -workspace <workspace.dsl>
+```
+
+It reports (all default to `error`; tune to `warning` / `info` / `ignore`):
+
+- **Workspace** — `workspace.scope` (is a scope set?), `workspace.tooling`.
+- **Model** — `model.empty`; a **description** on every person / software system / container /
+  component / relationship (`model.*.description`); a **technology** on every container / component /
+  deployment node / infrastructure node (`model.*.technology`); `model.element.disconnected`
+  (orphan); `model.element.noview` (element on no view); `model.softwaresystem.documentation` and
+  `.decisions` (a system *with containers* should have both); `model.deploymentnode.empty`.
+- **Views** — `views.empty`, `views.view.empty`, `views.view.key`, `views.view.layout`.
+
+These are the checks a human shouldn't have to eyeball — run `inspect` and fix the real hits before
+the render-and-look and content passes. **Caveat for the decentralized pattern:** run against a
+single per-system workspace, `inspect` flags the catalog-referenced *other* systems as
+`disconnected` / `noview` — expected (they're external to that workspace), read those as noise.
 
 ---
 
