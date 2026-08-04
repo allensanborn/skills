@@ -118,6 +118,24 @@ tag it `External` at the org level — you own it. Key moves:
   **generate** the landscape from them. Full recipe (incl. the license-free generation pipeline) in
   [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
 
+**Deployment view (the physical picture).** The static views (context/container/landscape) are
+**logical** — deliberately silent on *where things run*. A deployment view is the home for the
+physical facts they abstract away, **per environment** (dev/staging/prod). Reach for one when:
+
+- **co-location / sharing matters** — e.g. two logically-separate database containers that are
+  actually **the same instance** (separate schemas), or several services on one node. Keep them as
+  separate containers on the static views (ownership/lifecycle); show the co-location *only* here.
+  That's the honest place for "same connection string, different schema."
+- **the collector/agent topology matters** — an OTel collector as a **sidecar** (one per pod),
+  **DaemonSet agent** (one per node), or **gateway** (one cluster endpoint) is a deployment choice,
+  not a logical one. Model it with `infrastructureNode` (things *used* — LBs, DNS, agents, gateways)
+  vs `deploymentNode` (infra things are *deployed into*), and keep it off the static views.
+- **scaling / regions / environments differ** — draw one deployment view per environment.
+
+`containerInstance` / `softwareSystemInstance` place static-model elements onto nodes. Keep it
+legible the same way as any view: **exclude the cross-cutting telemetry/flag edges** — noise here
+too.
+
 ## DSL feature patterns (from the cookbook)
 
 - **Groups** — cluster related elements (by team, domain, bounded context):

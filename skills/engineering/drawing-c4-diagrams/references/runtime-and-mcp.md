@@ -153,6 +153,22 @@ Notes:
   `exclude`s the platform tag), not one base + a filtered derivative. Both are fine when the
   audience browses the live Structurizr server instead.
 
+## Image source: PlantUML vs Structurizr's own layout
+
+Two ways to get images, with a real quality/capability tradeoff:
+
+- **Headless export → PlantUML/Mermaid** (the pipeline above). These do their **own layout**, so
+  images are **regenerable with zero drift** — ideal for CI and repo-committed diagrams. Cost: the
+  layout is PlantUML's (rougher on dense diagrams — reduce edges by excluding cross-cutting rather
+  than fight it), and **`filtered` views / `perspectives` don't render at all** on this path.
+- **Structurizr's own renderer** — Lite in the browser (`structurizr/structurizr local`) or the
+  licensed server. Uses Structurizr's dagre layout plus any saved manual layout: the familiar,
+  cleaner C4 look, and the **only** way `filtered` views and `perspectives` appear. Cost: needs a
+  browser (and, for the server, a license), and hand-tuned layout can drift.
+
+Default to **headless PlantUML for committed images**; use the Structurizr renderer for a polished
+one-off, interactive layout tweaks, or when you need filtered/perspective views.
+
 ## Tier 0 — no tools
 
 Still useful: author and eyeball-validate the DSL, produce a **Mermaid** export as text,
