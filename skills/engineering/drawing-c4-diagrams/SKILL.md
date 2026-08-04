@@ -62,6 +62,11 @@ skip these. You are pinning what people always leave ambiguous:
 
 - **audience & purpose** — who reads this, and what decision does it support?
 - **the system in scope** — the single boundary this diagram is about.
+- **workspace scope** — **one** system, or **many**? If the architecture spans multiple systems —
+  especially across multiple teams/repos — size the scope (single-system vs one `unscoped` landscape
+  workspace vs the decentralized **enterprise** pattern) *before* authoring, using
+  [references/multi-system-and-enterprise.md](references/multi-system-and-enterprise.md). Structurizr's
+  default is **one software system per workspace**.
 - **the people/actors** who use it.
 - **the external systems** it depends on.
 - **which C4 level(s)** to draw now (start at System Context unless told otherwise).
@@ -126,6 +131,7 @@ repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poor
 - [references/c4-model.md](references/c4-model.md) — the C4 model itself: abstractions, the four levels, supplementary diagrams, notation.
 - [references/structurizr-dsl.md](references/structurizr-dsl.md) — how to write correct Structurizr DSL.
 - [references/patterns-and-pitfalls.md](references/patterns-and-pitfalls.md) — modeling patterns for common architectures, DSL cookbook features, and errors to catch.
+- [references/multi-system-and-enterprise.md](references/multi-system-and-enterprise.md) — when an architecture is many systems / many teams: the scope decision, the per-system-workspace enterprise pattern, and the license-free landscape generation pipeline.
 - [references/runtime-and-mcp.md](references/runtime-and-mcp.md) — setup flow, the MCP inner loop, and the Lite render loop.
 - [references/image-to-dsl.md](references/image-to-dsl.md) — turning a pasted image into DSL (one-pass vs grilled, level-by-level).
 - [references/grill-questions.md](references/grill-questions.md) — the two-phase Socratic question bank.

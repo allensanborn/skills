@@ -114,9 +114,9 @@ tag it `External` at the org level — you own it. Key moves:
   co-located on one instance) belong on a **deployment** view via `deploymentNode` /
   `infrastructureNode` — never on the static container/landscape views.
 - **Cross-team ownership at scale:** when a *different* team owns the platform and multiple repos
-  consume it, publish a platform **catalog workspace** and have product workspaces `extends` it
-  (docs.structurizr.com/dsl/cookbook/workspace-extension) rather than copy-pasting the systems. Real
-  overhead (single-parent limit, CLI landscape merge) — only worth it across teams/repos.
+  consume it, model each system as its own workspace that `extends` a shared **system catalog**, and
+  **generate** the landscape from them. Full recipe (incl. the license-free generation pipeline) in
+  [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
 
 ## DSL feature patterns (from the cookbook)
 

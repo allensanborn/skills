@@ -133,6 +133,12 @@ Notes:
   look rough on GitHub. For diagrams embedded in a repo README, prefer the **PNG/SVG** output.
 - The export needs the cloud theme only for exact colours; if `theme default` can't be fetched
   offline the export still succeeds with fallback styling.
+- **More local, license-free commands ship in the same image:** `generate` (merge per-system
+  workspaces into a landscape), `merge`, `validate`, `inspect`, `export`. Only the hosted
+  collaboration features — `server` (on-premises UI/API; the container **exits with "No license
+  found"** without one) and `create`/`push`/`pull` — require a **commercial Structurizr license**.
+  For the multi-workspace / enterprise landscape-generation pipeline see
+  [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
 - **`filtered` views and `perspectives` do NOT survive this export path.** The CLI silently skips
   `filtered` views — only the base view is written — and a filtered view additionally rejects
   `autolayout` on its base (*"automatic layout ... is not supported for filtered views"*).
