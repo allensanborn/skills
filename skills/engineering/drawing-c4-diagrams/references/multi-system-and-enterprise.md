@@ -66,8 +66,15 @@ workspace extends ../system-catalog/workspace.dsl {
         svc -> obsPlatform "Exports telemetry via" "OTLP" "Telemetry"
     }
     views {
-        systemContext <catalogId> "Context" { include *; autolayout lr }
-        container     <catalogId> "Containers" { include *; exclude obsPlatform; autolayout lr }
+        systemContext <catalogId> "Context" {
+            include *
+            autolayout lr
+        }
+        container <catalogId> "Containers" {
+            include *
+            exclude obsPlatform
+            autolayout lr
+        }
         !include ../_shared/styles.dsl
         theme default
     }

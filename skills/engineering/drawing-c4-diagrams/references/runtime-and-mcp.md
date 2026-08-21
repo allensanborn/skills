@@ -166,10 +166,13 @@ docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml -tsvg "structurizr-*.
 Notes:
 - One `.mmd`/`.puml` file is written **per view**, plus a `*-key.*` legend per view.
 - **Prefer `validate -workspace workspace.dsl`** as the parse check — it is the purpose-built
-  command and it reports the error without writing any files. A failed `export` (non-zero exit, or
-  a `StructurizrDslParserException` in the output) is an equally valid **validation signal** when
-  you were going to export anyway — treat either exactly like an MCP validation failure and fix
-  the DSL. `validate` catches parse errors; `inspect` is the separate **model lint** on top.
+  command and it reports the error without writing any files. **Exit codes are reliable and are
+  the signal to script on: `0` = parses, `1` = does not** (verified on v2026.06.28). On success it
+  prints *nothing* — silence is a pass, so don't wait for a confirmation line. On failure it logs
+  `ERROR com.structurizr.command.ValidateCommand -- <message> at line N of <file>`, which gives you
+  the offending line number directly. A failed `export` is an equally valid signal when you were
+  going to export anyway. `validate` catches parse errors; `inspect` is the separate **model lint**
+  on top.
 - Structurizr's Mermaid uses HTML `<div>` labels; they render in most Mermaid viewers but can
   look rough on GitHub. For diagrams embedded in a repo README, prefer the **PNG/SVG** output.
 - The export needs the cloud theme only for exact colours; if `theme default` can't be fetched
@@ -187,11 +190,20 @@ Notes:
   **prebuilt** binaries need a license, priced per installation by unique users/year
   (Small 1–20 £300/mo, Medium 21–50 £600/mo, Large 51–100 £900/mo, Enterprise 101+ by quote,
   billed annually). Don't quote these as current without checking — pricing drifts.
-- **Don't promise a user that `server` will start from the prebuilt image.** The announcement's
-  quickstart labels `docker run ... structurizr/structurizr server` "open core version", but the
-  binaries doc says prebuilt `server` needs a license, and the container has been observed to exit
-  with **"No license found"**. Have the user try it and read the output rather than asserting
-  either way. For the multi-workspace / enterprise landscape-generation pipeline see
+- **`server` will NOT start from the prebuilt image without a license — verified.** The
+  announcement's quickstart labels `docker run ... structurizr/structurizr server` "open core
+  version", which is misleading: on v2026.06.28 the container boots, prints its config, then stops
+  with
+
+  ```
+  No license found
+   - check the structurizr.license property has been configured
+   - request your 14-day trial license at https://trial.structurizr.com
+  ```
+
+  So set `structurizr.license`, grab the **14-day trial at trial.structurizr.com**, or build the
+  open core from source. Tell the user this up front rather than letting them discover it after
+  mounting a data directory. For the multi-workspace / enterprise landscape-generation pipeline see
   [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
 - **`filtered` views and `perspectives` do NOT survive this export path.** The CLI silently skips
   `filtered` views — only the base view is written — and a filtered view additionally rejects
