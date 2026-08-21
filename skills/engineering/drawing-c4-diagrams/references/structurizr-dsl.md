@@ -229,7 +229,7 @@ Notation is secondary but must be **consistent and explained** (a legend). Style
     }
 ```
 
-`theme default` gives the familiar Structurizr look; the MCP/Lite renderers draw the
+`theme default` gives the familiar Structurizr look; the MCP/`local` renderers draw the
 legend automatically from your styles.
 
 ## Rules of thumb

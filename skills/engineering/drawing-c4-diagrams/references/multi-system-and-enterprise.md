@@ -120,12 +120,21 @@ Critical requirements (each was a real failure mode):
 
 ## What needs a licensed server — and what doesn't
 
-`generate`, `export`, `merge`, `validate`, `inspect` are **local CLI commands** — no server, no
-license. So the whole pipeline above runs offline. Only the **hosted collaboration** features
-require a **commercial Structurizr license**:
+`generate`, `export`, `merge`, `validate`, `inspect` are **local commands** — no server, no
+license. So the whole pipeline above runs offline.
 
-- `server` — the on-premises UI/API. The container **exits with "No license found"** without one.
-- `create` / `push` / `pull` — publishing workspaces to that server.
+**Only `server` costs money.** Per [docs.structurizr.com/binaries](https://docs.structurizr.com/binaries),
+*"All Structurizr commands are free to use from these binaries except for `server`, which requires
+a license."* That means:
+
+- `server` — stands up your own Structurizr UI/API. **Licensed** from the prebuilt image (the
+  container **exits with "No license found"** without one). It is open core, so building from
+  source is free, minus the enterprise extras (SAML, role-based access, cloud storage).
+- `create` / `push` / `pull` / `list` — **free**. They are client commands; they need *a* server
+  to talk to, but they don't themselves need a license. (Older guidance in this skill said these
+  were licensed. They aren't.)
+- The **cloud service is end-of-life with no replacement** — it is not a `push` target to plan
+  around. Self-host `server`, or keep the pipeline fully local as above.
 
 The licensed path (each team `push`es its workspace to a shared server; the landscape is `pull`ed
 and `generate`d server-side) and the local pipeline produce the **same landscape**. Recommend the
