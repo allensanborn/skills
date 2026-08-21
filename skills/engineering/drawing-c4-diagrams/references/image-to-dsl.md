@@ -31,8 +31,9 @@ State your read of the complexity and your recommendation; let the user choose.
    - an outside box is an **external software system**, not part of the system in scope.
 3. **Generate one level** — usually System Context first. Write it to `workspace.dsl`
    following [structurizr-dsl.md](structurizr-dsl.md).
-4. **Validate + preview** — via MCP if connected, otherwise the headless `structurizr export`
-   (a failed export is the parse signal); Tier 0, careful reading. See
+4. **Validate + preview** — via MCP if connected, otherwise headless
+   `structurizr/structurizr validate -workspace workspace.dsl` (a failed `export` is the same
+   signal when you're exporting anyway); Tier 0, careful reading. See
    [runtime-and-mcp.md](runtime-and-mcp.md).
 5. **Layer the next level** — "add the containers" from a second image or by interviewing;
    append to the **same** model. Repeat for components if useful.
@@ -40,7 +41,7 @@ State your read of the complexity and your recommendation; let the user choose.
 ## The one-pass flow (simple images only)
 
 1. Read the image, map elements to C4 abstractions, and emit the full DSL.
-2. Validate (MCP or the headless export) and show a preview.
+2. Validate (MCP or the headless `validate`) and show a preview.
 3. Still run the **post-generation review grill** unless the user skipped it — one-pass
    trades rigor up front, so the review catches what the fast read missed.
 

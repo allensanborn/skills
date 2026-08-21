@@ -8,7 +8,7 @@
         "Runs the pre-generation scoping grill (audience, system-in-scope, actors, external systems, level) before emitting DSL",
         "Produces valid Structurizr DSL with one model and System Context + Container views",
         "Classifies the SPA/API/DB as C4 containers with technologies, and the SMTP/email as an external software system",
-        "Validates the DSL (MCP tools, or the headless structurizr export) and previews the result"
+        "Validates the DSL (MCP tools, or headless `structurizr/structurizr validate`) and previews the result"
       ],
       "files": []
     },
@@ -37,7 +37,7 @@
       "id": 4,
       "prompt": "Here's some Structurizr DSL I wrote but it won't render. Fix it. [DSL with a syntax error]",
       "expected_behavior": [
-        "Validates with whatever tier is available — MCP tools if connected, otherwise the headless `structurizr/structurizr export` (a parser exception / non-zero exit is the validation signal), or careful reading at Tier 0",
+        "Validates with whatever tier is available — MCP tools if connected, otherwise headless `structurizr/structurizr validate -workspace workspace.dsl` (a parser exception / non-zero exit is the validation signal; a failed `export` is the same signal), or careful reading at Tier 0",
         "Runs a validate -> fix -> re-validate loop until the DSL parses",
         "Explains what was wrong in C4 terms, not just syntax"
       ],
@@ -58,7 +58,7 @@
       "prompt": "I have Docker but haven't set up any Structurizr MCP server. Generate the C4 diagrams for my app and give me PNGs I can drop in the repo.",
       "expected_behavior": [
         "Does NOT assume MCP; uses the headless path — `structurizr/structurizr export` (DSL -> PlantUML) then rasterise PlantUML -> PNG/SVG",
-        "Treats a failed export as the validation signal; verifies each view is non-empty via the exported workspace.json counts",
+        "Runs `validate` (or treats a failed export) as the validation signal; verifies each view is non-empty via the exported workspace.json counts",
         "Prefers PNG/SVG over Mermaid for repo-committed images (Structurizr Mermaid uses HTML labels that render poorly on GitHub)"
       ],
       "files": []
@@ -100,6 +100,28 @@
         "Actually renders the view and looks at it (render-and-look is not skippable), not just DSL validation",
         "Checks for visual/scoping defects: empty view (verifies non-zero element/relationship counts), whole-landscape inclusions, hairballs, overlapping boxes, orphans, legibility",
         "Runs `structurizr inspect` for the model-completeness lint (missing descriptions/technology, disconnected elements, elements on no view)"
+      ],
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "I don't have Docker and I can't install anything. Where do I paste this DSL to see the diagram? And should I sign up for a Structurizr account to host it?",
+      "expected_behavior": [
+        "Points at the free open-source playground at `playground.structurizr.com` (not the old structurizr.com/dsl URL, and not the cloud service)",
+        "Says plainly that the Structurizr cloud service is end-of-life with no replacement, so signing up is not the move",
+        "Offers the self-hosted alternatives for later — `structurizr/structurizr playground` or `local` for free local use, `server` (licensed) for publishing to a team",
+        "Does NOT claim push/pull require a commercial license — only `server` does"
+      ],
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "Set up the Structurizr tooling for me — I've got Docker.",
+      "expected_behavior": [
+        "Pulls the consolidated `structurizr/structurizr` image for Tier 1, not the frozen `structurizr/lite` or `structurizr/cli` images (whose `:latest` is now a stub that exits immediately)",
+        "Uses the vNext subcommand names (`local`, `validate`, `export`, `inspect`, `generate`, `playground`) rather than the retired Lite/CLI product names",
+        "Treats `structurizr/mcp` as a separate image, only needed for the Tier 2 MCP inner loop",
+        "Defaults MCP to local Docker rather than the public `mcp.structurizr.com`"
       ],
       "files": []
     }

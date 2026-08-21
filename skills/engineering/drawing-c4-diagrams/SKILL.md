@@ -23,7 +23,7 @@ Copy this checklist and work top to bottom:
 - [ ] 1. SCOPE — pre-generation grill (hard to skip)
 - [ ] 2. AUTHOR — generate/extend Structurizr DSL (from words or a pasted image)
 - [ ] 3. VALIDATE + PREVIEW — inner loop (MCP; Mermaid preview)
-- [ ] 4. RENDER — outer loop (Structurizr Lite at :8080), if the user wants it
+- [ ] 4. RENDER — outer loop (`structurizr/structurizr local` at :8080), if the user wants it
 - [ ] 5. REVIEW — render-and-look (always) + post-generation grill (skippable), then export
 ```
 
@@ -34,9 +34,14 @@ tool is installed.
 
 | Tier | Needs | You can |
 | --- | --- | --- |
-| **0 — always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the structurizr.com/dsl playground |
-| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: validate (a failed `export` is your parse signal), render **PNG/SVG** (export → PlantUML), `inspect` (model lint), `generate system-landscape`. **No MCP or browser required.** |
-| **2 — +MCP and/or browser** | Docker + MCP / a browser | **MCP**: fast in-chat validate + Mermaid/PlantUML preview (inner loop). **Lite** (`structurizr/structurizr local`): interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
+| **0 — always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the playground at **`playground.structurizr.com`** |
+| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (export → PlantUML), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
+| **2 — +MCP and/or browser** | Docker + MCP / a browser | **MCP** (`structurizr/mcp`): fast in-chat validate + Mermaid/PlantUML preview (inner loop). **`structurizr/structurizr local`**: interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
+
+> **Naming:** Structurizr vNext consolidated Lite, the CLI, and the on-premises install into the
+> single `structurizr/structurizr` image — they are now the `local`, `export`/`validate`/…, and
+> `server` subcommands. The **cloud service is end-of-life with no replacement**; never point a
+> user at it. See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for the full map.
 
 On first use, look for the config file `.c4-diagrams.json` at the repo root. If it is
 missing, run the **setup flow** in [references/runtime-and-mcp.md](references/runtime-and-mcp.md):
@@ -104,15 +109,16 @@ user (validator → fix → repeat):
   [references/diagram-review-checklist.md](references/diagram-review-checklist.md) (*Inspections*).
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
-fallbacks. If Docker is present but MCP is not connected, use the **headless `structurizr/structurizr
-export`** command as the inner loop — a failed export (parser exception / non-zero exit) is your
-validation signal. At Tier 0 (no Docker), validate by careful reading and give the user the DSL
-plus a Mermaid export to paste into the playground.
+fallbacks. If Docker is present but MCP is not connected, use **`structurizr/structurizr validate
+-workspace workspace.dsl`** as the inner loop — it is the purpose-built parse check and writes no
+files. A failed `export` (parser exception / non-zero exit) is the same signal when you were
+exporting anyway. At Tier 0 (no Docker), validate by careful reading and give the user the DSL
+plus a Mermaid export to paste into `playground.structurizr.com`.
 
 ## 4. RENDER — the outer loop (optional)
 
-When the user wants the real, polished C4 render or to nudge layout, start **Structurizr
-Lite** (Docker, mounts the diagram dir, serves `http://localhost:8080`) per
+When the user wants the real, polished C4 render or to nudge layout, start
+**`structurizr/structurizr local`** (Docker, mounts the diagram dir, serves `http://localhost:8080`) per
 [references/runtime-and-mcp.md](references/runtime-and-mcp.md). Layout tweaks auto-save
 back to disk. Skip this entirely at Tier 0/1.
 
@@ -133,7 +139,7 @@ config), skip it. The **render-and-look pass (pass 1) is not** — always render
 export, even when the grill is skipped. Both default on.
 
 Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
-they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in Lite, or **headlessly via
+they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in `local`, or **headlessly via
 `structurizr/structurizr export`** (DSL → Mermaid/PlantUML, then rasterise PlantUML → PNG/SVG;
 see [references/runtime-and-mcp.md](references/runtime-and-mcp.md)). For diagrams committed to a
 repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
@@ -144,7 +150,7 @@ repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poor
 - [references/structurizr-dsl.md](references/structurizr-dsl.md) — how to write correct Structurizr DSL.
 - [references/patterns-and-pitfalls.md](references/patterns-and-pitfalls.md) — modeling patterns for common architectures, DSL cookbook features, and errors to catch.
 - [references/multi-system-and-enterprise.md](references/multi-system-and-enterprise.md) — when an architecture is many systems / many teams: the scope decision, the per-system-workspace enterprise pattern, and the license-free landscape generation pipeline.
-- [references/runtime-and-mcp.md](references/runtime-and-mcp.md) — setup flow, the MCP inner loop, and the Lite render loop.
+- [references/runtime-and-mcp.md](references/runtime-and-mcp.md) — setup flow, the vNext subcommand map, the MCP inner loop, and the `local` render loop.
 - [references/image-to-dsl.md](references/image-to-dsl.md) — turning a pasted image into DSL (one-pass vs grilled, level-by-level).
 - [references/grill-questions.md](references/grill-questions.md) — the two-phase Socratic question bank.
 - [references/diagram-review-checklist.md](references/diagram-review-checklist.md) — the pre-ship review checklist.
