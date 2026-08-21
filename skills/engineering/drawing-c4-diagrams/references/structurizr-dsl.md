@@ -105,6 +105,12 @@ or put a `{ tags "..." }` block on its **own lines**.
 Render one view per level. `include *` pulls in the relevant elements; always set
 `autolayout` (`tb`, `bt`, `lr`, or `rl`) so it renders without manual layout.
 
+> **One statement per line — there is no semicolon.** Collapsing a view body onto one line
+> (`systemContext s "Context" { include *; autolayout lr }`) is a **parse error**:
+> *"Too many tokens, expected: systemContext &lt;software system identifier&gt; [key] [description] {"*.
+> Verified against `structurizr/structurizr` v2026.06.28 — the one-liner exits 1, the
+> multi-line form below exits 0. The same applies to any block body.
+
 ```
 views {
     systemContext bank "SystemContext" "The big picture." {
