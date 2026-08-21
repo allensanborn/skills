@@ -118,7 +118,7 @@
       "id": 12,
       "prompt": "Set up the Structurizr tooling for me — I've got Docker.",
       "expected_behavior": [
-        "Pulls the consolidated `structurizr/structurizr` image for Tier 1, not the deprecated `structurizr/lite` or `structurizr/cli` redirect stubs",
+        "Pulls the consolidated `structurizr/structurizr` image for Tier 1, not the frozen `structurizr/lite` or `structurizr/cli` images (whose `:latest` is now a stub that exits immediately)",
         "Uses the vNext subcommand names (`local`, `validate`, `export`, `inspect`, `generate`, `playground`) rather than the retired Lite/CLI product names",
         "Treats `structurizr/mcp` as a separate image, only needed for the Tier 2 MCP inner loop",
         "Defaults MCP to local Docker rather than the public `mcp.structurizr.com`"

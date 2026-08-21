@@ -203,7 +203,8 @@ live Structurizr server.
 **Layout.** `autolayout <lr|rl|tb|bt> [rankSep] [nodeSep]` — e.g. `autolayout lr 300 150` widens
 spacing; `tb` often untangles a fan-in that `lr` crowds. But note the **image-source caveat**:
 PlantUML/Mermaid do their *own* layout on export, so `autolayout` mainly drives the interactive
-server. For a dense view, the fix is **fewer edges** (exclude the cross-cutting ones), not layout
+server — where vNext's upgraded Dagre routes arrows and labels noticeably better than Lite did.
+For a dense view, the fix is still **fewer edges** (exclude the cross-cutting ones), not layout
 knobs.
 
 **Verify before trusting a view.** A misscoped `include`/`exclude` can yield an **empty** view

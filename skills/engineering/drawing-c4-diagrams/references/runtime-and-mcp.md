@@ -21,9 +21,12 @@ because Docker is there.
 > **Structurizr vNext consolidated everything into one tool, one repo
 > ([structurizr/structurizr](https://github.com/structurizr/structurizr)), one image.**
 > Use `structurizr/structurizr` for everything except MCP. The older standalone
-> `structurizr/lite` and `structurizr/cli` images are now **deprecated redirect stubs** —
-> their entrypoint just prints a migration notice and exits, so a container started from them
-> dies immediately. Don't reach for them.
+> `structurizr/lite` and `structurizr/cli` images are **frozen** — the CLI, Lite, and the
+> on-premises installation "will not receive any further updates from this point forward."
+> Their **dated tags remain on Docker Hub** and still run (the old git repos are archived, not
+> deleted, so forking is a supported escape hatch), but **`:latest` was replaced with a stub**
+> that prints a migration notice and exits — a container started from it dies immediately.
+> Don't reach for either; there is no reason to author new diagrams on frozen tooling.
 >
 > **Old product → new subcommand** ([docs.structurizr.com/eol](https://docs.structurizr.com/eol)):
 >
@@ -38,7 +41,12 @@ because Docker is there.
 > or tell them to sign up for a structurizr.com workspace — send them to the **playground** or a
 > local run instead. Full subcommand set: `playground`, `local`, `server`, `export`, `push`,
 > `pull`, `branches`, `create`, `delete`, `lock`, `unlock`, `merge`, `validate`, `inspect`,
-> `list`, `generate`, `regenerate-apikey`.
+> `list`, `generate`, `regenerate-apikey`. To confirm against the installed build rather than
+> this list, run **`docker run -it --rm structurizr/structurizr help`**.
+>
+> Everything is now one Spring Boot app with embedded Tomcat (Java 21), so the `.war` is
+> interchangeable with the image — `java -jar structurizr.war <subcommand>` takes the same
+> subcommands. Useful when the user can't run Docker but does have a JVM.
 
 ## Contents
 - Setup flow (first run)
@@ -166,15 +174,24 @@ Notes:
   look rough on GitHub. For diagrams embedded in a repo README, prefer the **PNG/SVG** output.
 - The export needs the cloud theme only for exact colours; if `theme default` can't be fetched
   offline the export still succeeds with fallback styling.
-- **Everything in the prebuilt image is free except `server`.** Per
+- **Everything in the prebuilt image is free except `server`.** vNext moved to an **open core**
+  model. Free and open source: the CLI functionality (`push`, `pull`, `export`, …), `local`, and
+  `playground`. Only `server` — standing up **your own** Structurizr server — is gated. Per
   [docs.structurizr.com/binaries](https://docs.structurizr.com/binaries): *"All Structurizr
   commands are free to use from these binaries except for `server`, which requires a license."*
-  So `validate`, `export`, `inspect`, `merge`, `generate`, `playground`, `local` — **and** the
-  client commands `create`/`push`/`pull`/`list` that talk to someone else's server — cost nothing.
-  Only standing up **your own** server does. (`server` is open core: free if you build from
-  source, minus the enterprise extras — SAML, role-based access, cloud storage. The prebuilt
-  container **exits with "No license found"**.) For the multi-workspace / enterprise
-  landscape-generation pipeline see
+  So `validate`, `export`, `inspect`, `merge`, `generate` **and** the client commands
+  `create`/`push`/`pull`/`list` that talk to someone else's server all cost nothing.
+- **What "open core" gates:** the server core is open source; the **closed extensions** are the
+  enterprise features — authentication, cloud data storage, Elasticsearch integration, Redis for
+  distributed sessions, and the workspace admin API. Building `server` from source is free; the
+  **prebuilt** binaries need a license, priced per installation by unique users/year
+  (Small 1–20 £300/mo, Medium 21–50 £600/mo, Large 51–100 £900/mo, Enterprise 101+ by quote,
+  billed annually). Don't quote these as current without checking — pricing drifts.
+- **Don't promise a user that `server` will start from the prebuilt image.** The announcement's
+  quickstart labels `docker run ... structurizr/structurizr server` "open core version", but the
+  binaries doc says prebuilt `server` needs a license, and the container has been observed to exit
+  with **"No license found"**. Have the user try it and read the output rather than asserting
+  either way. For the multi-workspace / enterprise landscape-generation pipeline see
   [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
 - **`filtered` views and `perspectives` do NOT survive this export path.** The CLI silently skips
   `filtered` views — only the base view is written — and a filtered view additionally rejects
@@ -194,9 +211,14 @@ Two ways to get images, with a real quality/capability tradeoff:
   layout is PlantUML's (rougher on dense diagrams — reduce edges by excluding cross-cutting rather
   than fight it), and **`filtered` views / `perspectives` don't render at all** on this path.
 - **Structurizr's own renderer** — `structurizr/structurizr local` in the browser, or the
-  licensed server. Uses Structurizr's dagre layout plus any saved manual layout: the familiar,
+  licensed server. Uses Structurizr's Dagre layout plus any saved manual layout: the familiar,
   cleaner C4 look, and the **only** way `filtered` views and `perspectives` appear. Cost: needs a
   browser (and, for the server, a license), and hand-tuned layout can drift.
+  **vNext rebuilt this**: Dagre was upgraded and properly integrated into the renderer (notably
+  better at routing arrows and their labels around elements), and **server-side Graphviz autolayout
+  was dropped from the UI**. So auto-layout quality here is meaningfully better than in Lite — if a
+  past attempt was abandoned because the automatic layout was a mess, it is worth re-trying. Don't
+  offer Graphviz as a UI layout option; it still exists but is no longer wired into the UI.
 
 Default to **headless PlantUML for committed images**; use the Structurizr renderer for a polished
 one-off, interactive layout tweaks, or when you need filtered/perspective views.

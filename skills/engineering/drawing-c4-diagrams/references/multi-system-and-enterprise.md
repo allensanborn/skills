@@ -128,8 +128,10 @@ license. So the whole pipeline above runs offline.
 a license."* That means:
 
 - `server` — stands up your own Structurizr UI/API. **Licensed** from the prebuilt image (the
-  container **exits with "No license found"** without one). It is open core, so building from
-  source is free, minus the enterprise extras (SAML, role-based access, cloud storage).
+  container has been observed to exit with **"No license found"**). It is open core, so building
+  from source is free; the **closed** extensions are authentication, cloud data storage,
+  Elasticsearch integration, Redis distributed sessions, and the workspace admin API. Licensing
+  is per installation, priced by unique users per year.
 - `create` / `push` / `pull` / `list` — **free**. They are client commands; they need *a* server
   to talk to, but they don't themselves need a license. (Older guidance in this skill said these
   were licensed. They aren't.)
