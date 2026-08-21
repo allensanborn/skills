@@ -73,11 +73,67 @@ Based on Simon Brown's C4 model (c4model.com).
       actually a C4 container (a running application or data store), not a deployment
       node or an OS-level container image?
 
+## Render and look — visual & scoping defects
+
+The checks above read the *content*; these read the *picture*. **Actually render each view
+(PNG/SVG or the live server) and look at it** — the DSL validates fine on diagrams that are
+visually broken, and these defects are invisible in the source. This is a first-class part of
+the review, not optional.
+
+- [ ] **Empty / near-empty view** — Does a view render as a blank or one-box picture? A
+      misscoped `include`/`exclude` silently resolves to **0 elements**. **Verify the per-view
+      element and relationship counts** (from the exported `workspace.json`) before trusting any
+      view — an empty view is the most common silent failure.
+- [ ] **Out-of-scope inclusions** — Did a view drag in elements it shouldn't? `include *` on a
+      hub that everything points at pulls the **whole landscape** into one view. Scope it down
+      (explicit `include`, or `exclude` the hub).
+- [ ] **Hairball** — Too many crossing edges to follow? Usually a **cross-cutting dependency**
+      (telemetry, feature flags, auth) drawn on the wrong view. Move it to its own star view or
+      `exclude` it and show it separately.
+- [ ] **Overlapping boxes** — Do elements overlap or collide? Often caused by too many edges
+      forcing the layout engine; reduce edges (exclude cross-cutting), or try a different
+      `autolayout` direction (`tb` vs `lr`).
+- [ ] **Orphan / disconnected element** — Any box with no relationships (unless it's a
+      deliberately standalone actor)? It usually means a missing edge or a wrong-scope include.
+- [ ] **Legibility at size** — Is it readable at the size it will actually be viewed (README
+      thumbnail, slide)? Dense labels that are fine zoomed-in vanish at the real size.
+- [ ] **Styling survives the export** — Do the ownership colours, shapes, borders, and legend
+      render as intended in the format you're shipping? PlantUML and Mermaid style differently,
+      and a generated workspace has **no theme** unless you add one.
+
+The DSL-level fixes for scoping problems are in [structurizr-dsl.md](structurizr-dsl.md)
+(*View contents*); the machine-checkable model-completeness lint is **Inspections**, below.
+
+## Inspections — the automatable lint
+
+Structurizr ships an enumerated model lint ([docs](https://docs.structurizr.com/workspaces/inspections)).
+**Run it locally — no server, no license:**
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr inspect -workspace <workspace.dsl>
+```
+
+It reports (all default to `error`; tune to `warning` / `info` / `ignore`):
+
+- **Workspace** — `workspace.scope` (is a scope set?), `workspace.tooling`.
+- **Model** — `model.empty`; a **description** on every person / software system / container /
+  component / relationship (`model.*.description`); a **technology** on every container / component /
+  deployment node / infrastructure node (`model.*.technology`); `model.element.disconnected`
+  (orphan); `model.element.noview` (element on no view); `model.softwaresystem.documentation` and
+  `.decisions` (a system *with containers* should have both); `model.deploymentnode.empty`.
+- **Views** — `views.empty`, `views.view.empty`, `views.view.key`, `views.view.layout`.
+
+These are the checks a human shouldn't have to eyeball — run `inspect` and fix the real hits before
+the render-and-look and content passes. **Caveat for the decentralized pattern:** run against a
+single per-system workspace, `inspect` flags the catalog-referenced *other* systems as
+`disconnected` / `noview` — expected (they're external to that workspace), read those as noise.
+
 ---
 
 ## How to use it
 
-Hand the diagram to someone who did not create it, give no verbal narrative, and walk
-the list top to bottom. Each "no" is a concrete fix. A well-tooled workflow can enforce
-several of these automatically (names, keys, consistent notation); the rest are judgment
-calls this review exists to catch.
+**First render the views and look at them** (the *Render and look* section) — then hand the
+diagram to someone who did not create it, give no verbal narrative, and walk the content list top
+to bottom. Each "no" is a concrete fix. A well-tooled workflow can enforce several automatically
+(names, keys, consistent notation, empty-view counts); the rest are judgment calls this review
+exists to catch.

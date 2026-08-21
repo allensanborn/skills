@@ -8,7 +8,7 @@
         "Runs the pre-generation scoping grill (audience, system-in-scope, actors, external systems, level) before emitting DSL",
         "Produces valid Structurizr DSL with one model and System Context + Container views",
         "Classifies the SPA/API/DB as C4 containers with technologies, and the SMTP/email as an external software system",
-        "Validates the DSL and offers a Mermaid preview"
+        "Validates the DSL (MCP tools, or the headless structurizr export) and previews the result"
       ],
       "files": []
     },
@@ -28,6 +28,7 @@
       "prompt": "Draw a container diagram for our system (no other detail given).",
       "expected_behavior": [
         "Does NOT invent scope; grills for audience, boundary, actors, and externals first",
+        "Also assesses whether this is one system or many (workspace scope) before authoring",
         "Refuses to proceed to DSL until the scoping questions are answered"
       ],
       "files": []
@@ -36,7 +37,7 @@
       "id": 4,
       "prompt": "Here's some Structurizr DSL I wrote but it won't render. Fix it. [DSL with a syntax error]",
       "expected_behavior": [
-        "Validates via the Structurizr MCP tools",
+        "Validates with whatever tier is available — MCP tools if connected, otherwise the headless `structurizr/structurizr export` (a parser exception / non-zero exit is the validation signal), or careful reading at Tier 0",
         "Runs a validate -> fix -> re-validate loop until the DSL parses",
         "Explains what was wrong in C4 terms, not just syntax"
       ],
@@ -47,8 +48,58 @@
       "prompt": "Skip the grill, just give me container-diagram DSL for a two-service system with a queue between them.",
       "expected_behavior": [
         "Still runs the hard-to-skip pre-generation scoping essentials",
-        "Honors 'skip the grill' for the POST-generation review only",
+        "Honors 'skip the grill' for the POST-generation CONTENT grill only — still renders and eyeballs the result",
         "Produces valid DSL with the queue modelled as a container with a technology"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "I have Docker but haven't set up any Structurizr MCP server. Generate the C4 diagrams for my app and give me PNGs I can drop in the repo.",
+      "expected_behavior": [
+        "Does NOT assume MCP; uses the headless path — `structurizr/structurizr export` (DSL -> PlantUML) then rasterise PlantUML -> PNG/SVG",
+        "Treats a failed export as the validation signal; verifies each view is non-empty via the exported workspace.json counts",
+        "Prefers PNG/SVG over Mermaid for repo-committed images (Structurizr Mermaid uses HTML labels that render poorly on GitHub)"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Our platform spans about a dozen services owned by different teams, in separate repos. Model the architecture in C4.",
+      "expected_behavior": [
+        "Assesses scope up front and recognizes this is multi-system / multi-team, not one workspace",
+        "Recommends the enterprise pattern (one software-system-scoped workspace per system + a shared system catalog they `extends`, plus a generated landscape) rather than cramming everything into one workspace",
+        "Notes the landscape can be GENERATED locally with `generate system-landscape` (needs `!impliedRelationships true`; no server/license), and that only the hosted server + create/push/pull are license-gated"
+      ],
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Two of our services share one Postgres instance (separate schemas), and the OTel collector runs as a gateway. Show where things actually run.",
+      "expected_behavior": [
+        "Draws a deployment view (not a container view) for the physical topology",
+        "Puts the shared-instance / co-location and the collector's sidecar-vs-agent-vs-gateway topology on the deployment view via deploymentNode / infrastructureNode, keeping them off the static container/landscape views",
+        "Keeps the two schemas as separate database containers on the static views (ownership/lifecycle), co-located only on the deployment view"
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Every service in our system reads feature flags from flagd and exports telemetry to an OpenTelemetry collector. Include that in the diagrams.",
+      "expected_behavior": [
+        "Recognizes the cross-cutting fan-in and keeps it OFF the clean container/landscape view (excludes the platform elements) rather than drawing N identical arrows",
+        "Shows the fan-in in a dedicated star view (seed the hub + afferent `->hub`, then exclude the business edges) and/or on each consumer's own context view",
+        "Models flagd + the collector as internal Platform software systems (grouped), and treats externality as scope-relative (external from a product team's viewpoint)"
+      ],
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Here's my finished workspace.dsl — is the container diagram good to ship?",
+      "expected_behavior": [
+        "Actually renders the view and looks at it (render-and-look is not skippable), not just DSL validation",
+        "Checks for visual/scoping defects: empty view (verifies non-zero element/relationship counts), whole-landscape inclusions, hairballs, overlapping boxes, orphans, legibility",
+        "Runs `structurizr inspect` for the model-completeness lint (missing descriptions/technology, disconnected elements, elements on no view)"
       ],
       "files": []
     }
@@ -59,6 +110,8 @@
     { "query": "turn this whiteboard photo into a diagram", "should_trigger": true },
     { "query": "write me a Structurizr DSL workspace", "should_trigger": true },
     { "query": "document our system architecture visually", "should_trigger": true },
+    { "query": "model our multi-team platform as a system landscape", "should_trigger": true },
+    { "query": "generate a deployment diagram for our services", "should_trigger": true },
     { "query": "draw a sequence diagram of this function", "should_trigger": false },
     { "query": "make a bar chart of these sales numbers", "should_trigger": false },
     { "query": "diagram this database ER schema", "should_trigger": false }

@@ -6,12 +6,17 @@ This skill uses local Structurizr runtimes with different jobs:
   Mermaid/PlantUML. Fast, no browser.
 - **Structurizr Lite** — the human's **outer loop**: render real C4 diagrams and edit
   layout in a browser at `http://localhost:8080`.
-- **Structurizr CLI** (`export` subcommand) — a **headless** inner-loop fallback when MCP is
-  not connected: validate the DSL and export Mermaid/PlantUML with no browser and no MCP
-  server (then rasterise to PNG/SVG). See [Headless export](#headless-export-no-mcp-no-browser).
+- **Structurizr CLI** (`export` / `inspect` / `generate` subcommands) — the **headless
+  workhorse** and the **practical default whenever Docker is present**: validate (a failed
+  `export` is the parse signal), export Mermaid/PlantUML → rasterise to PNG/SVG, `inspect` (model
+  lint), `generate system-landscape`. No MCP server, no browser. See
+  [Headless export](#headless-export-no-mcp-no-browser).
 
-All are optional. Work at the highest tier the environment supports and degrade
-gracefully — **never assume Docker is installed**.
+All are optional, but note the shape: **with Docker, the headless CLI is the baseline**
+(validate + render images + inspect + generate); **MCP and Lite are enhancements on top** (a
+faster in-chat loop, and interactive layout). Work at the highest tier the environment supports
+and degrade gracefully — **never assume Docker is installed**, and **don't assume MCP** just
+because Docker is there.
 
 > **Use the consolidated `structurizr/structurizr` image for both Lite and the CLI**
 > (`structurizr/structurizr local` and `structurizr/structurizr export ...`). The older
@@ -147,6 +152,22 @@ Notes:
   **committed images**, author them as **two explicit views** (e.g. one `include *`, one that
   `exclude`s the platform tag), not one base + a filtered derivative. Both are fine when the
   audience browses the live Structurizr server instead.
+
+## Image source: PlantUML vs Structurizr's own layout
+
+Two ways to get images, with a real quality/capability tradeoff:
+
+- **Headless export → PlantUML/Mermaid** (the pipeline above). These do their **own layout**, so
+  images are **regenerable with zero drift** — ideal for CI and repo-committed diagrams. Cost: the
+  layout is PlantUML's (rougher on dense diagrams — reduce edges by excluding cross-cutting rather
+  than fight it), and **`filtered` views / `perspectives` don't render at all** on this path.
+- **Structurizr's own renderer** — Lite in the browser (`structurizr/structurizr local`) or the
+  licensed server. Uses Structurizr's dagre layout plus any saved manual layout: the familiar,
+  cleaner C4 look, and the **only** way `filtered` views and `perspectives` appear. Cost: needs a
+  browser (and, for the server, a license), and hand-tuned layout can drift.
+
+Default to **headless PlantUML for committed images**; use the Structurizr renderer for a polished
+one-off, interactive layout tweaks, or when you need filtered/perspective views.
 
 ## Tier 0 — no tools
 

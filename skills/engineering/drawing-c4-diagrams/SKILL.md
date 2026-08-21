@@ -24,7 +24,7 @@ Copy this checklist and work top to bottom:
 - [ ] 2. AUTHOR — generate/extend Structurizr DSL (from words or a pasted image)
 - [ ] 3. VALIDATE + PREVIEW — inner loop (MCP; Mermaid preview)
 - [ ] 4. RENDER — outer loop (Structurizr Lite at :8080), if the user wants it
-- [ ] 5. REVIEW — post-generation grill (skippable), then export
+- [ ] 5. REVIEW — render-and-look (always) + post-generation grill (skippable), then export
 ```
 
 ## 0. Capabilities and setup
@@ -34,9 +34,9 @@ tool is installed.
 
 | Tier | Needs | You can |
 | --- | --- | --- |
-| **0 — always** | nothing | author + validate DSL by eye, export **Mermaid** as text, tell the user to paste it into the structurizr.com/dsl playground |
-| **1 — +MCP** | Docker (or the public server) | validate/parse DSL and export Mermaid/PlantUML programmatically — the fast inner loop |
-| **2 — +Lite** | Docker + a browser | render real C4 diagrams and edit layout at `http://localhost:8080` |
+| **0 — always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the structurizr.com/dsl playground |
+| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: validate (a failed `export` is your parse signal), render **PNG/SVG** (export → PlantUML), `inspect` (model lint), `generate system-landscape`. **No MCP or browser required.** |
+| **2 — +MCP and/or browser** | Docker + MCP / a browser | **MCP**: fast in-chat validate + Mermaid/PlantUML preview (inner loop). **Lite** (`structurizr/structurizr local`): interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
 
 On first use, look for the config file `.c4-diagrams.json` at the repo root. If it is
 missing, run the **setup flow** in [references/runtime-and-mcp.md](references/runtime-and-mcp.md):
@@ -96,6 +96,12 @@ user (validator → fix → repeat):
 
 - Validate/parse with `structurizr-mcp:*` DSL tools.
 - Export a **Mermaid** view for an inline preview (renders in chat/Markdown, no browser).
+- **Verify each view isn't empty.** Parsing OK ≠ view correct — a misscoped `include`/`exclude`
+  renders **0 elements**. Check the per-view element/relationship counts (from the exported
+  `workspace.json`) before moving on.
+- If Docker is present, run **`structurizr inspect`** for the model-completeness lint (missing
+  descriptions/technology, orphans, elements on no view, empty views) — no server needed; see
+  [references/diagram-review-checklist.md](references/diagram-review-checklist.md) (*Inspections*).
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
 fallbacks. If Docker is present but MCP is not connected, use the **headless `structurizr/structurizr
@@ -112,13 +118,19 @@ back to disk. Skip this entirely at Tier 0/1.
 
 ## 5. REVIEW — the post-generation grill (skippable), then export
 
-Walk the diagram against [references/diagram-review-checklist.md](references/diagram-review-checklist.md)
-using the **Section C** review questions in the grill bank — challenge each box's
-abstraction level, demand a label + direction for every relationship, flag missing
-externals and omitted technology. Length scales with the diagram, not a fixed count.
+Review has **two passes**, both driven by [references/diagram-review-checklist.md](references/diagram-review-checklist.md):
 
-This grill **is skippable**: if the user says "skip the grill" (or set it off in config),
-skip straight to export. It is on by default.
+1. **Render and look** (not optional) — actually render the views (PNG/SVG or the live server)
+   and eyeball them against the *Render and look* checklist. DSL validation passes on diagrams
+   that are visually broken: empty views, a view that pulled in the whole landscape, hairballs,
+   overlapping boxes, orphans. These are invisible in the source.
+2. **The content grill** — walk the **Section C** review questions in the grill bank: challenge
+   each box's abstraction level, demand a label + direction for every relationship, flag missing
+   externals and omitted technology. Length scales with the diagram, not a fixed count.
+
+The **content grill (pass 2) is skippable**: if the user says "skip the grill" (or set it off in
+config), skip it. The **render-and-look pass (pass 1) is not** — always render and eyeball before
+export, even when the grill is skipped. Both default on.
 
 Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
 they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in Lite, or **headlessly via
