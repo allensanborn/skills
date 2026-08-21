@@ -1,14 +1,23 @@
 # Runtime, setup, and the local Structurizr toolchain
 
-This skill uses two local Structurizr runtimes with different jobs:
+This skill uses local Structurizr runtimes with different jobs:
 
 - **Structurizr MCP** — the agent's **inner loop**: validate/parse DSL and export views to
   Mermaid/PlantUML. Fast, no browser.
 - **Structurizr Lite** — the human's **outer loop**: render real C4 diagrams and edit
   layout in a browser at `http://localhost:8080`.
+- **Structurizr CLI** (`export` subcommand) — a **headless** inner-loop fallback when MCP is
+  not connected: validate the DSL and export Mermaid/PlantUML with no browser and no MCP
+  server (then rasterise to PNG/SVG). See [Headless export](#headless-export-no-mcp-no-browser).
 
-Both are optional. Work at the highest tier the environment supports and degrade
+All are optional. Work at the highest tier the environment supports and degrade
 gracefully — **never assume Docker is installed**.
+
+> **Use the consolidated `structurizr/structurizr` image for both Lite and the CLI**
+> (`structurizr/structurizr local` and `structurizr/structurizr export ...`). The older
+> standalone `structurizr/lite` and `structurizr/cli` images are now **deprecated redirect
+> stubs** — their entrypoint just prints a migration notice and exits, so a container started
+> from them dies immediately. Don't reach for them.
 
 ## Contents
 - Setup flow (first run)
@@ -94,6 +103,50 @@ docker run -it --rm -p 8080:8080 \
   with the model this skill builds.
 - Handle the common failures: Docker not installed → drop to Tier 1/0; port 8080 busy →
   offer another port and update config.
+
+## Headless export (no MCP, no browser)
+
+When you have Docker but no MCP server and don't want the browser (common: rendering images
+into a repo from a CI-like flow), the same `structurizr/structurizr` image exports views
+directly from the DSL. This is the reliable way to produce committable diagrams at Tier 2.
+
+```bash
+cd docs/architecture   # the dir holding workspace.dsl
+
+# 1. DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
+docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+  export -workspace workspace.dsl -format mermaid  -output exports
+docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+  export -workspace workspace.dsl -format plantuml -output exports
+
+# 2. PlantUML -> PNG + SVG (rasterise; needs no network)
+cd exports
+docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml -tpng "structurizr-*.puml"
+docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml -tsvg "structurizr-*.puml"
+```
+
+Notes:
+- One `.mmd`/`.puml` file is written **per view**, plus a `*-key.*` legend per view.
+- A failed `export` (non-zero exit, or a `StructurizrDslParserException` in the output) is your
+  **validation signal** — treat it exactly like an MCP validation failure and fix the DSL.
+- Structurizr's Mermaid uses HTML `<div>` labels; they render in most Mermaid viewers but can
+  look rough on GitHub. For diagrams embedded in a repo README, prefer the **PNG/SVG** output.
+- The export needs the cloud theme only for exact colours; if `theme default` can't be fetched
+  offline the export still succeeds with fallback styling.
+- **More local, license-free commands ship in the same image:** `generate` (merge per-system
+  workspaces into a landscape), `merge`, `validate`, `inspect`, `export`. Only the hosted
+  collaboration features — `server` (on-premises UI/API; the container **exits with "No license
+  found"** without one) and `create`/`push`/`pull` — require a **commercial Structurizr license**.
+  For the multi-workspace / enterprise landscape-generation pipeline see
+  [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
+- **`filtered` views and `perspectives` do NOT survive this export path.** The CLI silently skips
+  `filtered` views — only the base view is written — and a filtered view additionally rejects
+  `autolayout` on its base (*"automatic layout ... is not supported for filtered views"*).
+  `perspectives` are an interactive-only overlay in the Structurizr UI (the binoculars / `p` key),
+  invisible in PlantUML/Mermaid output. So if you need "clean" and "full" variants of a diagram in
+  **committed images**, author them as **two explicit views** (e.g. one `include *`, one that
+  `exclude`s the platform tag), not one base + a filtered derivative. Both are fine when the
+  audience browses the live Structurizr server instead.
 
 ## Tier 0 — no tools
 

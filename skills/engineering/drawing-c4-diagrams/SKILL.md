@@ -62,6 +62,11 @@ skip these. You are pinning what people always leave ambiguous:
 
 - **audience & purpose** — who reads this, and what decision does it support?
 - **the system in scope** — the single boundary this diagram is about.
+- **workspace scope** — **one** system, or **many**? If the architecture spans multiple systems —
+  especially across multiple teams/repos — size the scope (single-system vs one `unscoped` landscape
+  workspace vs the decentralized **enterprise** pattern) *before* authoring, using
+  [references/multi-system-and-enterprise.md](references/multi-system-and-enterprise.md). Structurizr's
+  default is **one software system per workspace**.
 - **the people/actors** who use it.
 - **the external systems** it depends on.
 - **which C4 level(s)** to draw now (start at System Context unless told otherwise).
@@ -93,8 +98,10 @@ user (validator → fix → repeat):
 - Export a **Mermaid** view for an inline preview (renders in chat/Markdown, no browser).
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
-fallbacks. At Tier 0 (no MCP), validate by careful reading and give the user the DSL plus
-a Mermaid export to paste into the playground.
+fallbacks. If Docker is present but MCP is not connected, use the **headless `structurizr/structurizr
+export`** command as the inner loop — a failed export (parser exception / non-zero exit) is your
+validation signal. At Tier 0 (no Docker), validate by careful reading and give the user the DSL
+plus a Mermaid export to paste into the playground.
 
 ## 4. RENDER — the outer loop (optional)
 
@@ -113,14 +120,18 @@ externals and omitted technology. Length scales with the diagram, not a fixed co
 This grill **is skippable**: if the user says "skip the grill" (or set it off in config),
 skip straight to export. It is on by default.
 
-Finally, export the finished views (Mermaid/PlantUML via MCP, or PNG/SVG via Lite) into
-`<configured-dir>/exports/` and tell the user where they are.
+Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
+they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in Lite, or **headlessly via
+`structurizr/structurizr export`** (DSL → Mermaid/PlantUML, then rasterise PlantUML → PNG/SVG;
+see [references/runtime-and-mcp.md](references/runtime-and-mcp.md)). For diagrams committed to a
+repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
 
 ## References
 
 - [references/c4-model.md](references/c4-model.md) — the C4 model itself: abstractions, the four levels, supplementary diagrams, notation.
 - [references/structurizr-dsl.md](references/structurizr-dsl.md) — how to write correct Structurizr DSL.
 - [references/patterns-and-pitfalls.md](references/patterns-and-pitfalls.md) — modeling patterns for common architectures, DSL cookbook features, and errors to catch.
+- [references/multi-system-and-enterprise.md](references/multi-system-and-enterprise.md) — when an architecture is many systems / many teams: the scope decision, the per-system-workspace enterprise pattern, and the license-free landscape generation pipeline.
 - [references/runtime-and-mcp.md](references/runtime-and-mcp.md) — setup flow, the MCP inner loop, and the Lite render loop.
 - [references/image-to-dsl.md](references/image-to-dsl.md) — turning a pasted image into DSL (one-pass vs grilled, level-by-level).
 - [references/grill-questions.md](references/grill-questions.md) — the two-phase Socratic question bank.
