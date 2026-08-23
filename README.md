@@ -65,8 +65,9 @@ rewrites `.git/hooks` with a version that has no `bd dolt push` in it.
 dead and no local database, while 7 real issues sat unreachable on the remote:
 
 ```bash
-git config --get core.hooksPath     # must print .beads/hooks
-bd list                             # must show issues, not "no beads database found"
+if [ -n "$(git config --get core.hooksPath)" ] || [ -f .git/hooks/pre-push ]
+then echo "hooks OK"; else echo "HOOKS DEAD — run git config core.hooksPath .beads/hooks"; fi
+bd list >/dev/null 2>&1 && echo "db OK" || echo "NO DATABASE — run bd bootstrap"
 ```
 
 A green `git push` proves nothing on its own. To confirm sync end to end, make a real issue
