@@ -13,7 +13,7 @@ set -uo pipefail
 audit_one() {
   local d=$1 bad=0
   cd "$d" 2>/dev/null || { echo "$d: not a directory"; return 1; }
-  printf '%-20s' "$(basename "$d")"
+  printf '%-24s' "$(basename "$d")"
 
   # Hooks: covers BOTH arrangements — pre-commit-installed, and core.hooksPath (bd's
   # tracked hooks). Do NOT reduce to `ls .git/hooks | grep -v sample`: `ls` is aliased on
