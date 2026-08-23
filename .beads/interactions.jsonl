@@ -1,0 +1,1 @@
+{"id":"int-cf6aa0493ea932e50f7bc89e333f8d99","kind":"field_change","created_at":"2026-08-23T00:37:56.780659Z","actor":"Allen Sanborn","issue_id":"skills-5cl","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Canary served its purpose: proved the tracked pre-push hook advances refs/dolt/data (6db6911 -> d0ace8c)."}}
