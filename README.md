@@ -70,6 +70,13 @@ then echo "hooks OK"; else echo "HOOKS DEAD — run git config core.hooksPath .b
 bd list >/dev/null 2>&1 && echo "db OK" || echo "NO DATABASE — run bd bootstrap"
 ```
 
+Or just run the packaged version, which also checks the Dolt remote, `beads.role`, `.beads`
+permissions and unpushed commits, and exits non-zero if anything is wrong:
+
+```bash
+./ci/beads-audit.sh
+```
+
 A green `git push` proves nothing on its own. To confirm sync end to end, make a real issue
 change and watch the ref move — note that a push with no issue changes correctly leaves it
 untouched:
