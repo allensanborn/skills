@@ -1,0 +1,73 @@
+{
+  "skill_name": "too-much",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this 600-line PR diff for bugs and design problems. [diff that yields ~12 findings and several open questions]",
+      "expected_behavior": [
+        "Writes every finding and question to the ledger, including per-item detail, before presenting any of them",
+        "Presents at most 3 open items, 2-4 lines each, with a marked default and what happens if deferred",
+        "Ends with the one-line footer (parked count, fyi count, ledger path) instead of listing the rest"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Help me plan migrating our monolith to services. [plan with many unknowns: team ownership, data split, cutover, auth]",
+      "expected_behavior": [
+        "Recognizes that the response would contain more than 3 questions and uses the ledger instead of asking them inline",
+        "Ranks items that block other work first (e.g. data ownership before cutover order)",
+        "Logs low-stakes items as fyi with its own decision instead of asking the user"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "(mid-triage; Q4 is irreversible and currently shown, Q5 is not) defaults all",
+      "expected_behavior": [
+        "Accepts defaults for the reversible open and parked items and records each one in the ledger",
+        "Does NOT accept the default on the irreversible Q4; asks for an explicit answer",
+        "Closes or updates dependents settled by the accepted defaults"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "(mid-triage) Q4 B, Q5 default, Q6 defer",
+      "expected_behavior": [
+        "Records each resolution in the ledger (Q4's answer verbatim) before replying",
+        "Marks Q6 deferred, not dropped",
+        "Presents the next batch with no recap of the resolved items"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "(new session after compaction; a .too-much/ ledger or a too-much beads epic exists) focus Q9",
+      "expected_behavior": [
+        "Finds the existing ledger instead of saying there isn't one",
+        "Explains Q9 from its stored detail (evidence, options, what happens if deferred) without redoing the investigation"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "(mid-triage, while fixing F3) this makes me wonder whether we need rate limiting at all",
+      "expected_behavior": [
+        "Adds the rate-limiting question to the ledger as parked instead of asking it inline",
+        "Continues the current batch unless the new item blocks it"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "(in a repo with .beads/ and a working bd) too much, triage this",
+      "expected_behavior": [
+        "Uses beads: one parent epic labeled too-much, one child per item with type and irreversible labels and a priority",
+        "Records resolutions with bd close --reason, using the user's words verbatim",
+        "Picks the next batch with bd ready --parent, excluding parked items"
+      ],
+      "files": []
+    }
+  ]
+}

@@ -16,6 +16,15 @@ for Claude Code and compatible agents. Structured like
   and defend the design instead of passively accepting generated output. Bootstraps from a
   pasted whiteboard/hand-drawn/existing-diagram image.
 
+### Productivity
+
+- **[too-much](skills/productivity/too-much/)** — turn a sprawling pile of findings,
+  questions, and decisions into a tracked ledger (beads if the project has it, markdown
+  otherwise) and work through it in terse batches of at most 3, so nothing gets lost.
+  Low-stakes calls are logged as `fyi`; irreversible ones always need an explicit answer.
+  Triggers on "triage", "too much", "one at a time", "status", "next", or any response that
+  would ask more than 3 questions.
+
 ## Install
 
 ```bash
