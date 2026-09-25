@@ -1,0 +1,17 @@
+{
+  "name": "allensanborn",
+  "owner": {
+    "name": "Allen Sanborn",
+    "url": "https://github.com/allensanborn"
+  },
+  "description": "Allen Sanborn's agent skills, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "allensanborn-skills",
+      "source": "./",
+      "description": "C4 architecture diagrams with a Socratic grill, and a triage ledger for when a task produces too much to answer at once.",
+      "category": "productivity",
+      "keywords": ["skills", "architecture", "c4", "triage"]
+    }
+  ]
+}

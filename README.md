@@ -27,13 +27,36 @@ for Claude Code and compatible agents. Structured like
 
 ## Install
 
+Pick **one** of these. Installing more than one gives you every skill twice.
+
+**Claude Code plugin**: a read-only bundle that updates when a new `version` ships.
+
+```text
+/plugin marketplace add allensanborn/skills
+/plugin install allensanborn-skills@allensanborn
+```
+
+**[skills.sh](https://skills.sh)**: copies skill files you can edit into your project. Works
+with Codex and other Agent Skills harnesses too.
+
 ```bash
 npx skills@latest add allensanborn/skills
 ```
 
-Or copy a skill directory into your project's `.claude/skills/`.
+**Working on this repo**: symlink every skill into `~/.claude/skills` and `~/.agents/skills`,
+so your edits are live in the next session and `git pull` updates them:
+
+```bash
+./scripts/link-skills.sh
+```
 
 ## Develop
+
+Skills live in category folders. `engineering/` and `productivity/` are **shipped**: each
+skill in them must be listed in [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json)
+(`ci/check.sh` enforces this). Drafts go in [`skills/in-progress/`](skills/in-progress/),
+which the plugin doesn't ship but the link script still links. To release, bump `version` in
+`plugin.json`. Claude Code uses it to decide when installed users get an update.
 
 Skills follow [Anthropic's authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices):
 lean `SKILL.md` (<500 lines), progressive disclosure via `references/` (one level deep),
@@ -44,7 +67,7 @@ minutes) — see [`.dagger/`](.dagger/). GitHub Actions are added only once a sk
 proven ship-ready.
 
 ```bash
-# local lint (skill-lint + reference link check)
+# local lint (plugin manifest + skill-lint + reference link check)
 bash ci/check.sh
 ```
 
