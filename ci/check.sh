@@ -7,6 +7,27 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+echo "==> plugin manifest lists exactly the shipped skills"
+# Shipped = every SKILL.md outside in-progress/, personal/, misc/, deprecated/.
+shipped="$(find skills -name SKILL.md \
+  -not -path 'skills/in-progress/*' -not -path 'skills/personal/*' \
+  -not -path 'skills/misc/*' -not -path 'skills/deprecated/*' \
+  -exec dirname {} \; | sed 's|^|./|' | sort)"
+listed="$(grep -oE '"\./skills/[^"]+"' .claude-plugin/plugin.json | tr -d '"' | sort)"
+if [ "$shipped" != "$listed" ]; then
+  echo "plugin.json 'skills' is out of sync with skills/ (< on disk, > in plugin.json):"
+  diff <(echo "$shipped") <(echo "$listed") || true
+  exit 1
+fi
+
+if command -v claude >/dev/null 2>&1; then
+  echo "==> claude plugin validate --strict"
+  claude plugin validate . --strict
+  claude plugin validate .claude-plugin/plugin.json --strict
+else
+  echo "==> claude plugin validate: skipped (claude CLI not installed)"
+fi
+
 echo "==> skill-lint"
 # Validates SKILL.md name/description limits, allowed frontmatter fields,
 # one-level references, referenced-files-exist, <500 lines.

@@ -1,0 +1,14 @@
+{
+  "name": "allensanborn-skills",
+  "version": "0.1.0",
+  "description": "C4 architecture diagrams with a Socratic grill.",
+  "author": {
+    "name": "Allen Sanborn",
+    "url": "https://github.com/allensanborn"
+  },
+  "repository": "https://github.com/allensanborn/skills",
+  "keywords": ["skills", "architecture", "c4", "structurizr"],
+  "skills": [
+    "./skills/engineering/drawing-c4-diagrams"
+  ]
+}
