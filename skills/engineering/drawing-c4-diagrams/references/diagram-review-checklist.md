@@ -89,7 +89,13 @@ the review, not optional.
       (explicit `include`, or `exclude` the hub).
 - [ ] **Hairball** — Too many crossing edges to follow? Usually a **cross-cutting dependency**
       (telemetry, feature flags, auth) drawn on the wrong view. Move it to its own star view or
-      `exclude` it and show it separately.
+      `exclude` it and show it separately. If the crowding is services-to-stores rather than one
+      shared hub, **split by role**: a request-path view with the stores excluded, plus a small data
+      view per store group ([patterns](patterns-and-pitfalls.md#crowded-container-view-split-by-role)).
+- [ ] **Collapsed deployment view** — Is a deployment view a pile of overlapping boxes in one
+      corner, or exactly 2000x2000 px? A relationship ending on a **deployment node** (instead of an
+      instance or infrastructure node) breaks Structurizr's layout silently. Retarget the edge or move
+      the fact into the node's description. Check image dimensions for every deployment view.
 - [ ] **Overlapping boxes** — Do elements overlap or collide? Often caused by too many edges
       forcing the layout engine; reduce edges (exclude cross-cutting), or try a different
       `autolayout` direction (`tb` vs `lr`).

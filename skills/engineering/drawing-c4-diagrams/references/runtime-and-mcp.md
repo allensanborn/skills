@@ -8,7 +8,7 @@ This skill uses local Structurizr runtimes with different jobs:
   edit layout in a browser at `http://localhost:8080`. (This is what used to be Structurizr Lite.)
 - **`structurizr/structurizr` headless subcommands** (`validate` / `export` / `inspect` /
   `generate`) — the **headless workhorse** and the **practical default whenever Docker is
-  present**: `validate` the DSL, export Mermaid/PlantUML → rasterise to PNG/SVG, `inspect` (model
+  present**: `validate` the DSL, render PNG/SVG (own layout, or Mermaid/PlantUML → rasterise), `inspect` (model
   lint), `generate system-landscape`. No MCP server, no browser. See
   [Headless export](#headless-export-no-mcp-no-browser).
 
@@ -144,6 +144,10 @@ When you have Docker but no MCP server and don't want the browser (common: rende
 into a repo from a CI-like flow), the same `structurizr/structurizr` image exports views
 directly from the DSL. This is the reliable way to produce committable diagrams at Tier 2.
 
+**Preferred for committed images: Structurizr's own PNG/SVG export** (better layout than PlantUML;
+see [below](#png-and-svg-with-structurizrs-own-layout-preferred)). The PlantUML pipeline in the next
+block is the fallback when you cannot build that image.
+
 ```bash
 cd docs/architecture   # the dir holding workspace.dsl
 
@@ -151,7 +155,7 @@ cd docs/architecture   # the dir holding workspace.dsl
 docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
   validate -workspace workspace.dsl
 
-# 1. DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
+# 1. (fallback path) DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
 docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace workspace.dsl -format mermaid  -output exports
 docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
@@ -202,11 +206,51 @@ Notes:
   `exclude`s the platform tag), not one base + a filtered derivative. Both are fine when the
   audience browses the live Structurizr server instead.
 
+### PNG and SVG with Structurizr's own layout (preferred)
+
+`export -format png|svg` runs Structurizr's own renderer (the same Dagre layout as `local`) in headless
+Chromium via Playwright. **The prebuilt `structurizr/structurizr` image cannot do it**: it accepts the
+flag, then fails with *"Exporting to PNG/SVG is not supported in this build"*. Build the pinned tag
+from source in a throwaway stage and keep only the war, on Microsoft's Playwright Java image. One
+file, Docker only, nothing built on the host, layer-cached (first run ~3.5 min, then ~15 s):
+
+```bash
+tag=v2026.09.19 pw=1.62.0   # pw must equal the playwright version in structurizr-application/pom.xml at that tag
+img=structurizr-render:$tag
+docker build -q -t "$img" - >/dev/null <<DOCKERFILE
+FROM maven:3.9-eclipse-temurin-21 AS build
+RUN git clone -q --depth 1 --branch $tag https://github.com/structurizr/structurizr /src \
+ && cd /src && mvn -q -B -DskipTests -pl structurizr-application -am package
+FROM mcr.microsoft.com/playwright/java:v$pw-noble
+COPY --from=build /src/structurizr-application/target/structurizr-*.war /structurizr.war
+WORKDIR /work
+ENTRYPOINT ["java", "-jar", "/structurizr.war"]
+DOCKERFILE
+cd docs/architecture
+docker run --rm --ipc=host -v "$PWD:/work" "$img" validate -workspace workspace.dsl
+docker run --rm --ipc=host -v "$PWD:/work" "$img" export -workspace workspace.dsl -format png -output exports
+docker run --rm --ipc=host -v "$PWD:/work" "$img" export -workspace workspace.dsl -format svg -output exports
+```
+
+Gotchas (all hit for real):
+- **A deployment-view relationship must not end on a deployment node** (only on container /
+  software-system instances or infrastructure nodes). One such edge makes the whole view collapse to a
+  2000x2000 pile of overlapping boxes, with no error, whatever the `autolayout` direction. State
+  "provisioned by X" in the node's description instead, or point the edge at an infrastructure node.
+- **Check the output size.** A fallback of exactly 2000x2000 means the layout failed; the exporter
+  still reports success.
+- **Each PNG carries a render-time footer**, so every re-render changes every image even when the
+  model did not. Restore unchanged images (`git checkout`) before committing, or accept the noise.
+- **`filtered` views still fail headless**: the base view cannot have `autolayout` ("not supported for
+  filtered views"), and without autolayout there is no layout. Author two explicit views instead.
+- Verified on `v2026.09.19` with Playwright 1.62.0. Output files are named `<view-key>.png`
+  (no `structurizr-` prefix, unlike the PlantUML path), plus `<view-key>-key.png` for the legend.
+
 ## Image source: PlantUML vs Structurizr's own layout
 
 Two ways to get images, with a real quality/capability tradeoff:
 
-- **Headless export → PlantUML/Mermaid** (the pipeline above). These do their **own layout**, so
+- **Headless export → PlantUML/Mermaid** (the fallback pipeline). These do their **own layout**, so
   images are **regenerable with zero drift** — ideal for CI and repo-committed diagrams. Cost: the
   layout is PlantUML's (rougher on dense diagrams — reduce edges by excluding cross-cutting rather
   than fight it), and **`filtered` views / `perspectives` don't render at all** on this path.
@@ -220,8 +264,10 @@ Two ways to get images, with a real quality/capability tradeoff:
   past attempt was abandoned because the automatic layout was a mess, it is worth re-trying. Don't
   offer Graphviz as a UI layout option; it still exists but is no longer wired into the UI.
 
-Default to **headless PlantUML for committed images**; use the Structurizr renderer for a polished
-one-off, interactive layout tweaks, or when you need filtered/perspective views.
+Default to **headless Structurizr PNG/SVG for committed images** (the container build above: same
+renderer as `local`, still regenerable, no browser session); fall back to headless PlantUML when that
+image cannot be built. Use `local` for interactive layout tweaks or when you need filtered/perspective
+views.
 
 ## Tier 0 — no tools
 

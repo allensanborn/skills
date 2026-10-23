@@ -155,6 +155,11 @@ Deployment views map container **instances** onto infrastructure:
     }
 ```
 
+**Relationships in a deployment environment must end on instances** (`containerInstance`,
+`softwareSystemInstance`) **or `infrastructureNode`s, never on a `deploymentNode`.** An edge like
+`tool -> region` (to say "provisions everything inside") compiles and exports, but collapses the
+rendered view into a 2000x2000 pile. Put that fact in the node's description instead.
+
 ## View contents: include / exclude, expressions, and layout
 
 `include`/`exclude` decide *what* a view shows. This is where most "the diagram is wrong"
