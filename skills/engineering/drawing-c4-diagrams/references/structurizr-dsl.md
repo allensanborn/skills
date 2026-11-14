@@ -299,8 +299,28 @@ installed names drop the day.
 - **Icons go on the deployment view only** — tag `deploymentNode`s and `infrastructureNode`s, never
   the logical containers (an Aurora icon on the "Database" container conflates C4 levels).
 - Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the
-  generated key too. PlantUML/Mermaid exports may ignore themes — icons are a PNG/SVG/`local` feature.
+  generated key too.
 - The theme supplies icons only; keep your base styles alongside it.
+
+### Icons outside the Structurizr renderer (PlantUML, Mermaid)
+
+The text exporters only emit icons whose URL starts with `http`; an **installed** theme's icons are
+`data:` URIs, so PlantUML and Mermaid silently drop them. To get icons there, load the **same theme
+by URL** — Structurizr's GitHub copy works (relative icon names resolve against it):
+
+```
+        theme https://raw.githubusercontent.com/structurizr/structurizr/main/structurizr-themes/amazon-web-services-2025.07/theme.json
+```
+
+| Export | Icons with the URL theme |
+| --- | --- |
+| `-format plantuml` (Structurizr style) | **All**, on deployment and infrastructure nodes. PlantUML fetches and embeds them at render time. |
+| `-format plantuml/c4plantuml` | **None** on deployment views: the exporter writes every `Deployment_Node` with `$tags=""`, so the tag sprites never attach. |
+| `-format mermaid` | **Infrastructure nodes only**, and only with `properties { "mermaid.icons" "true" }`. Deployment nodes become subgraphs with no icon; icons stretch to node width; the SVG keeps remote `<img>` URLs (blank offline). |
+
+Costs of the URL theme: network at export/render time, and `main` can move — pin a commit SHA in
+the URL for reproducible output. Prefer the installed theme + PNG/SVG export; use the URL theme only
+when PlantUML output is required. `evals/render/test.sh` asserts all of this (Docker + network).
 
 ```
     deploymentEnvironment "Live" {

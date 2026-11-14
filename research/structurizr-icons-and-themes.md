@@ -57,8 +57,7 @@ AWS 2025.07 tags for a typical web stack (verified in `theme.json`): `Route 53`,
 ## Where icons render
 
 - Structurizr browser renderer (`local`, `playground`, `server`, PNG/SVG export): yes.
-- PlantUML / Mermaid exports: themes "may not be fully supported" (themes cookbook). Not tested.
-  Treat icons as a PNG/SVG-only feature.
+- PlantUML / Mermaid exports: only with a URL-loaded theme; see the verification log below.
 - C4 puts provider icons on **deployment** views only; context/container views stay logical.
 
 ## Changelog points
@@ -80,8 +79,13 @@ AWS 2025.07 tags for a typical web stack (verified in `theme.json`): `Route 53`,
 - `color #ffffff` on `"Element"` makes deployment/infrastructure node labels invisible (white on white).
 - `theme default`: WARN *"The Structurizr cloud service will reach its End of Life (EOL) on 30
   September 2026 and this theme will not be available"*, then exports unstyled, exit 0.
-- Still untested: PlantUML/Mermaid exports with a theme; `local` (port 8080) picking up installed
-  themes. `static.structurizr.com` DNS failed from two networks; permanent per the EOL warning.
+- PlantUML/Mermaid (2026-11-14, `evals/render/test.sh`, plantuml 1.2026.10, mermaid-cli 12.0.0):
+  exporters accept only `http*` icons (`AbstractPlantUMLExporter.isSupportedIcon`,
+  `MermaidDiagramExporter.elementStyleHasSupportedIcon`), so installed-theme `data:` icons are
+  dropped (0 of 9). With the theme loaded from raw.githubusercontent.com: Structurizr PlantUML 9/9,
+  rendered and embedded; C4-PlantUML 0/9 (`Deployment_Node(..., $tags="")`); Mermaid 3/9 with
+  `mermaid.icons` = true (infrastructure nodes only; subgraphs get none; remote `<img>` in SVG).
+- Still untested: `local` (port 8080) picking up installed themes. `static.structurizr.com` DNS failed from two networks; permanent per the EOL warning.
 
 ## Sources
 
