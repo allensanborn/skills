@@ -96,6 +96,11 @@ the review, not optional.
       corner, or exactly 2000x2000 px? A relationship ending on a **deployment node** (instead of an
       instance or infrastructure node) breaks Structurizr's layout silently. Retarget the edge or move
       the fact into the node's description. Check image dimensions for every deployment view.
+- [ ] **Invisible labels / missing icons** — Can you read every node's name? White text on a
+      deployment or infrastructure node means `color` was set on `"Element"`; set it per type. If
+      the DSL uses a cloud theme, does every tagged node show its icon? A missing icon means the tag
+      doesn't match that theme version's `theme.json` exactly. Unstyled grey boxes everywhere mean a
+      `theme default` slipped in.
 - [ ] **Overlapping boxes** — Do elements overlap or collide? Often caused by too many edges
       forcing the layout engine; reduce edges (exclude cross-cutting), or try a different
       `autolayout` direction (`tb` vs `lr`).

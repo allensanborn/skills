@@ -24,7 +24,7 @@ workspace "Name" "Optional description" {
     }
     views {
         # one view per C4 level you want to show
-        theme default
+        # styles { ... } — see "Styles, tags, themes" (never `theme default`: it is dead)
     }
 }
 ```
@@ -125,7 +125,6 @@ views {
         api -> db "Looks up user"
         autolayout lr
     }
-    theme default
 }
 ```
 
@@ -235,8 +234,96 @@ Notation is secondary but must be **consistent and explained** (a legend). Style
     }
 ```
 
-`theme default` gives the familiar Structurizr look; the MCP/`local` renderers draw the
-legend automatically from your styles.
+The MCP/`local` renderers draw the legend automatically from your styles.
+
+**Never write `theme default`.** It points at `static.structurizr.com`, which died with the cloud
+service (EOL 30 Sep 2026). It still parses; export logs an EOL warning and renders **unstyled**, with
+no error. For the familiar C4 look, write the base styles yourself:
+
+```
+        styles {
+            element "Person" {
+                background #08427b
+                color #ffffff
+                shape person
+            }
+            element "Software System" {
+                background #1168bd
+                color #ffffff
+            }
+            element "Container" {
+                background #438dd5
+                color #ffffff
+            }
+            element "Component" {
+                background #85bbf0
+                color #000000
+            }
+            element "Database" {
+                shape cylinder
+            }
+        }
+```
+
+Set `color` per element type, **never on `"Element"`**: that also hits deployment and infrastructure
+nodes, whose white background then hides every label (verified — invisible text, no error).
+
+### Cloud icon themes (AWS, Azure, GCP, OCI, Kubernetes)
+
+Provider icons ship **inside** the `structurizr/structurizr` image at `/usr/local/structurizr-themes`;
+reference one by bare name — no URL, no network, no CORS:
+
+```
+    views {
+        theme amazon-web-services-2025.07
+    }
+```
+
+Installed names: `amazon-web-services-2020.04|2022.04|2023.01|2025.07`,
+`microsoft-azure-2019.09|2020.07|2021.01|2023.01|2024.07|2025.11`,
+`google-cloud-platform-v1.5|2025.09`, `oracle-cloud-infrastructure-2020.04|2021.04|2023.04`,
+`kubernetes`. Cookbook URLs like `.../amazon-web-services-2023.01.31/theme.json` are dead; the
+installed names drop the day.
+
+- **The CLI must be told where they are**: `docker run -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes …`.
+  Without it, `validate`/`export` fail: *"Theme amazon-web-services-2025.07 does not exist at /work/…"*.
+  (Alternatively a `themes/` dir next to `workspace.dsl` is used first.)
+- **An element gets an icon by carrying the exact tag** from that version's `theme.json`; tags change
+  between versions. Verified AWS 2025.07 tags for a typical web stack, all prefixed
+  `Amazon Web Services - `: `AWS Cloud`, `Region`, `Virtual private cloud VPC`, `Public subnet`,
+  `Private subnet`, `Route 53`, `CloudFront`, `WAF`, `Load Balancing`, `API Gateway`,
+  `Elastic Container Service`, `Fargate`, `Lambda`, `Aurora`, `ElastiCache`,
+  `Simple Storage Service`, `OpenSearch Service`, `Simple Queue Service`, `Simple Email Service`,
+  `Cognito`. There is no Availability Zone tag. List a version's tags with
+  `docker run --rm --entrypoint cat structurizr/structurizr /usr/local/structurizr-themes/<name>/theme.json`.
+- **Icons go on the deployment view only** — tag `deploymentNode`s and `infrastructureNode`s, never
+  the logical containers (an Aurora icon on the "Database" container conflates C4 levels).
+- Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the
+  generated key too. PlantUML/Mermaid exports may ignore themes — icons are a PNG/SVG/`local` feature.
+- The theme supplies icons only; keep your base styles alongside it.
+
+```
+    deploymentEnvironment "Live" {
+        deploymentNode "AWS" {
+            tags "Amazon Web Services - AWS Cloud"
+            deploymentNode "us-east-1" {
+                tags "Amazon Web Services - Region"
+                alb = infrastructureNode "ALB" {
+                    tags "Amazon Web Services - Load Balancing"
+                }
+                deploymentNode "ECS on Fargate" {
+                    tags "Amazon Web Services - Fargate"
+                    apiInstance = containerInstance api
+                }
+                deploymentNode "Aurora PostgreSQL" {
+                    tags "Amazon Web Services - Aurora"
+                    containerInstance db
+                }
+                alb -> apiInstance "Forwards to"
+            }
+        }
+    }
+```
 
 ## Rules of thumb
 

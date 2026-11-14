@@ -65,7 +65,8 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
 
 1. Probe: is `docker` on PATH? Is a browser available? Is an MCP server reachable?
 2. Ask the user which tier they want. **Prefer Docker** when offering to install tooling:
-   - Tier 1 → `docker pull structurizr/structurizr`
+   - Tier 1 → `docker pull structurizr/structurizr:<release>-playwright` (e.g. `2026.10.26-playwright`;
+     the only variant that can export PNG/SVG — see below)
    - Tier 2 → also `docker pull structurizr/mcp` (MCP is still a **separate image**)
 3. Ask where diagrams should live (default `docs/architecture/`).
 4. Ask whether the post-generation review grill is on (default: on).
@@ -146,7 +147,7 @@ directly from the DSL. This is the reliable way to produce committable diagrams 
 
 **Preferred for committed images: Structurizr's own PNG/SVG export** (better layout than PlantUML;
 see [below](#png-and-svg-with-structurizrs-own-layout-preferred)). The PlantUML pipeline in the next
-block is the fallback when you cannot build that image.
+block is the fallback when you cannot use the `-playwright` image.
 
 ```bash
 cd docs/architecture   # the dir holding workspace.dsl
@@ -176,8 +177,10 @@ Notes:
   the DSL. `validate` catches parse errors; `inspect` is the separate **model lint** on top.
 - Structurizr's Mermaid uses HTML `<div>` labels; they render in most Mermaid viewers but can
   look rough on GitHub. For diagrams embedded in a repo README, prefer the **PNG/SVG** output.
-- The export needs the cloud theme only for exact colours; if `theme default` can't be fetched
-  offline the export still succeeds with fallback styling.
+- Never use `theme default`: its host died with the cloud service; export logs an EOL warning
+  and renders unstyled. Write base styles; for provider icons use an **installed** theme (needs
+  `-e STRUCTURIZR_THEMES=/usr/local/structurizr-themes`) — see
+  [structurizr-dsl.md](structurizr-dsl.md#cloud-icon-themes-aws-azure-gcp-oci-kubernetes).
 - **Everything in the prebuilt image is free except `server`.** vNext moved to an **open core**
   model. Free and open source: the CLI functionality (`push`, `pull`, `export`, …), `local`, and
   `playground`. Only `server` — standing up **your own** Structurizr server — is gated. Per
@@ -209,28 +212,24 @@ Notes:
 ### PNG and SVG with Structurizr's own layout (preferred)
 
 `export -format png|svg` runs Structurizr's own renderer (the same Dagre layout as `local`) in headless
-Chromium via Playwright. **The prebuilt `structurizr/structurizr` image cannot do it**: it accepts the
-flag, then fails with *"Exporting to PNG/SVG is not supported in this build"*. Build the pinned tag
-from source in a throwaway stage and keep only the war, on Microsoft's Playwright Java image. One
-file, Docker only, nothing built on the host, layer-cached (first run ~3.5 min, then ~15 s):
+Chromium via Playwright. **The default `structurizr/structurizr` tags cannot do it**: they accept the
+flag, then fail with *"Exporting to PNG/SVG is not supported in this build"*. Since 2026.04.19
+Structurizr publishes an official **`<release>-playwright`** tag (Microsoft's Playwright Java base +
+the same war + the bundled themes) that can. Pin the release:
 
 ```bash
-tag=v2026.09.19 pw=1.62.0   # pw must equal the playwright version in structurizr-application/pom.xml at that tag
-img=structurizr-render:$tag
-docker build -q -t "$img" - >/dev/null <<DOCKERFILE
-FROM maven:3.9-eclipse-temurin-21 AS build
-RUN git clone -q --depth 1 --branch $tag https://github.com/structurizr/structurizr /src \
- && cd /src && mvn -q -B -DskipTests -pl structurizr-application -am package
-FROM mcr.microsoft.com/playwright/java:v$pw-noble
-COPY --from=build /src/structurizr-application/target/structurizr-*.war /structurizr.war
-WORKDIR /work
-ENTRYPOINT ["java", "-jar", "/structurizr.war"]
-DOCKERFILE
+img=structurizr/structurizr:2026.10.26-playwright   # newest *-playwright tag on Docker Hub
+run() { docker run --rm --ipc=host -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
+          -v "$PWD:/work" -w /work "$img" "$@"; }
 cd docs/architecture
-docker run --rm --ipc=host -v "$PWD:/work" "$img" validate -workspace workspace.dsl
-docker run --rm --ipc=host -v "$PWD:/work" "$img" export -workspace workspace.dsl -format png -output exports
-docker run --rm --ipc=host -v "$PWD:/work" "$img" export -workspace workspace.dsl -format svg -output exports
+run validate -workspace workspace.dsl
+run export -workspace workspace.dsl -format png -output exports
+run export -workspace workspace.dsl -format svg -output exports
 ```
+
+`STRUCTURIZR_THEMES` only matters if the DSL uses an installed theme (e.g. AWS icons); it is harmless
+otherwise. In zsh, pass `-e` and its value as separate words — a `$T="-e …"` variable is not
+word-split, the variable never arrives and `validate` fails with *"Theme … does not exist"*.
 
 Gotchas (all hit for real):
 - **A deployment-view relationship must not end on a deployment node** (only on container /
@@ -243,7 +242,10 @@ Gotchas (all hit for real):
   model did not. Restore unchanged images (`git checkout`) before committing, or accept the noise.
 - **`filtered` views still fail headless**: the base view cannot have `autolayout` ("not supported for
   filtered views"), and without autolayout there is no layout. Author two explicit views instead.
-- Verified on `v2026.09.19` with Playwright 1.62.0. Output files are named `<view-key>.png`
+- Verified on `2026.10.26-playwright` (2026-11-13), including an AWS-themed deployment view whose
+  icons render in the PNG, the SVG (base64-embedded) and the key. The earlier build-from-source
+  recipe (Maven stage + `mcr.microsoft.com/playwright/java`) is only needed for an unreleased
+  commit. Output files are named `<view-key>.png`
   (no `structurizr-` prefix, unlike the PlantUML path), plus `<view-key>-key.png` for the legend.
 
 ## Image source: PlantUML vs Structurizr's own layout

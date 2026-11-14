@@ -35,7 +35,7 @@ tool is installed.
 | Tier | Needs | You can |
 | --- | --- | --- |
 | **0 — always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the playground at **`playground.structurizr.com`** |
-| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (Structurizr's own layout via a one-stage Docker build; PlantUML is the fallback), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
+| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (Structurizr's own layout via the official `<release>-playwright` image; PlantUML is the fallback), cloud provider **icons** (AWS/Azure/GCP/OCI/K8s themes bundled in the image), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
 | **2 — +MCP and/or browser** | Docker + MCP / a browser | **MCP** (`structurizr/mcp`): fast in-chat validate + Mermaid/PlantUML preview (inner loop). **`structurizr/structurizr local`**: interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
 
 > **Naming:** Structurizr vNext consolidated Lite, the CLI, and the on-premises install into the
@@ -140,7 +140,7 @@ export, even when the grill is skipped. Both default on.
 
 Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
 they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in `local`, or **headlessly via
-Structurizr's own PNG/SVG export** (needs a small Docker build because the prebuilt image can't do it;
+Structurizr's own PNG/SVG export** (needs the `<release>-playwright` image tag; the default tag can't do it;
 recipe in [references/runtime-and-mcp.md](references/runtime-and-mcp.md); PlantUML → PNG/SVG is the fallback). For diagrams committed to a
 repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
 

@@ -167,7 +167,9 @@ too.
 - **Filtered views** — derive a focused view by include/exclude on tags, instead of a new
   model: good for "too many elements" on large systems.
 - **Element / relationship styles + themes** — style by tag (`element "Database" { shape cylinder }`);
-  `theme default` for the familiar look; keep styling consistent (the legend is generated).
+  write base styles for the familiar look (`theme default` is dead); installed themes such as
+  `amazon-web-services-2025.07` add provider icons to deployment views; keep styling consistent
+  (the legend is generated). See [structurizr-dsl.md](structurizr-dsl.md#styles-tags-themes).
 - **Custom elements** — for things outside the standard C4 set when genuinely needed.
 - **Deployment groups** — keep instances of separate environments/tenants from wiring
   together in deployment views.
