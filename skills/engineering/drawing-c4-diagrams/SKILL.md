@@ -22,7 +22,7 @@ Copy this checklist and work top to bottom:
 - [ ] 0. Load capability config (or run setup) and locate the workspace
 - [ ] 1. SCOPE — pre-generation grill (hard to skip)
 - [ ] 2. AUTHOR — generate/extend Structurizr DSL (from words or a pasted image)
-- [ ] 3. VALIDATE + PREVIEW — inner loop (MCP; Mermaid preview)
+- [ ] 3. VALIDATE + PREVIEW — inner loop (MCP if connected, else headless `validate`)
 - [ ] 4. RENDER — outer loop (`structurizr/structurizr local` at :8080), if the user wants it
 - [ ] 5. REVIEW — render-and-look (always) + post-generation grill (skippable), then export
 ```
@@ -35,7 +35,7 @@ tool is installed.
 | Tier | Needs | You can |
 | --- | --- | --- |
 | **0 — always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the playground at **`playground.structurizr.com`** |
-| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (export → PlantUML), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
+| **1 — +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (Structurizr's own layout via the official `<release>-playwright` image; PlantUML is the fallback), cloud provider **icons** (AWS/Azure/GCP/OCI/K8s themes bundled in the image), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
 | **2 — +MCP and/or browser** | Docker + MCP / a browser | **MCP** (`structurizr/mcp`): fast in-chat validate + Mermaid/PlantUML preview (inner loop). **`structurizr/structurizr local`**: interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
 
 > **Naming:** Structurizr vNext consolidated Lite, the CLI, and the on-premises install into the
@@ -79,6 +79,11 @@ skip these. You are pinning what people always leave ambiguous:
 This is the step that stops "boxes and lines that mean different things to different
 people." Do not proceed to DSL until these are answered.
 
+**If the user says "skip the grill"** (or "just give me the DSL"), don't ask, and don't silently guess
+either: open with a short **Assumptions** list covering the same points (audience, system in scope,
+one system or many, people, externals, level), then author. The scope stays visible and correctable
+without a round trip. Skipping the grill never skips the render-and-look pass in step 5.
+
 ## 2. AUTHOR — generate the Structurizr DSL
 
 Write or extend `workspace.dsl` following [references/structurizr-dsl.md](references/structurizr-dsl.md).
@@ -96,11 +101,12 @@ Docker-container-vs-C4-container or infra-vs-software-system confusion) before e
 
 ## 3. VALIDATE + PREVIEW — the inner loop
 
-After every DSL edit, if MCP is available, validate and preview **before** showing the
-user (validator → fix → repeat):
+After every DSL edit, validate and preview **before** showing the user (validator → fix →
+repeat):
 
-- Validate/parse with `structurizr-mcp:*` DSL tools.
-- Export a **Mermaid** view for an inline preview (renders in chat/Markdown, no browser).
+- **Validate:** with MCP connected, the `structurizr-mcp:*` DSL tools; otherwise (Tier 1) the headless
+  `validate` below.
+- **Preview:** with MCP, export a **Mermaid** view inline (renders in chat/Markdown, no browser).
 - **Verify each view isn't empty.** Parsing OK ≠ view correct — a misscoped `include`/`exclude`
   renders **0 elements**. Check the per-view element/relationship counts (from the exported
   `workspace.json`) before moving on.
@@ -140,8 +146,8 @@ export, even when the grill is skipped. Both default on.
 
 Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
 they are — Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in `local`, or **headlessly via
-`structurizr/structurizr export`** (DSL → Mermaid/PlantUML, then rasterise PlantUML → PNG/SVG;
-see [references/runtime-and-mcp.md](references/runtime-and-mcp.md)). For diagrams committed to a
+Structurizr's own PNG/SVG export** (needs the `<release>-playwright` image tag; the default tag can't do it;
+recipe in [references/runtime-and-mcp.md](references/runtime-and-mcp.md); PlantUML → PNG/SVG is the fallback). For diagrams committed to a
 repo, prefer PNG/SVG — Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
 
 ## References

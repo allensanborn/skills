@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-8
+expected_outcome: |
+  Draws a deployment view (not a container view) for the physical topology
+  Puts the shared-instance / co-location and the collector's sidecar-vs-agent-vs-gateway topology on the deployment view via deploymentNode / infrastructureNode, keeping them off the static container/landscape views
+  Keeps the two schemas as separate database containers on the static views (ownership/lifecycle), co-located only on the deployment view

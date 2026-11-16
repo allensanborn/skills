@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-10
+expected_outcome: |
+  Actually renders the view and looks at it (render-and-look is not skippable), not just DSL validation
+  Checks for visual/scoping defects: empty view (verifies non-zero element/relationship counts), whole-landscape inclusions, hairballs, overlapping boxes, orphans, legibility
+  Runs `structurizr inspect` for the model-completeness lint (missing descriptions/technology, disconnected elements, elements on no view)

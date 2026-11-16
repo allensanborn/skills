@@ -36,8 +36,8 @@ worker   -> broker "Subscribes to OrderPlaced from" "Kafka"
 
 **Microservices.** Each service is a container; a shared broker or API gateway is also a
 container. Use [groups](#dsl-feature-patterns-from-the-cookbook) to cluster by
-team/domain. Beware the "too many boxes" pitfall — split into multiple container views or
-use filtered views if it gets crowded.
+team/domain. Beware the "too many boxes" pitfall — split into multiple container views (see
+[Crowded container view](#crowded-container-view-split-by-role)) or use filtered views if it gets crowded.
 
 **API gateway / BFF.** The gateway is a container that fronts other containers; label each
 edge with what it routes.
@@ -57,6 +57,25 @@ deployable unit); the managed platform (e.g. Lambda, API Gateway) appears in the
 
 **Shared database (antipattern to surface).** If two systems write the same DB, say so
 explicitly and flag the coupling in the grill — don't hide it behind one arrow.
+
+**Crowded container view: split by role.** Simon Brown's advice for a distributed system
+([Diagramming distributed architectures with the C4 model](https://dev.to/simonbrown/diagramming-distributed-architectures-with-the-c4-model-51cm)):
+don't draw one big diagram; draw several, each on one domain, bounded context, capability or feature,
+or on **one service plus its direct couplings**. For a system with several services and several
+stateful stores, the split that works is by **role**, not by element:
+
+1. **Request path** — people, externals, the gateway and the services. **Exclude every datastore
+   and the bus** (`exclude "element.tag==Database" "element==eventBus"`). `autolayout tb`. This is the
+   "who calls whom" story.
+2. **One data view per store group** — the 2-3 services that own a group of stores, plus those stores,
+   by explicit `include "element==x"`: e.g. booking (holds + DB + bus), read path (cache + DB + bus),
+   search (indexer + index + DB). A shared store (the DB) appears in several views; that is fine,
+   each view then shows only that group's edges. `autolayout tb 150 100`.
+
+One combined "services above, stores below" view still hairballs: PlantUML and Structurizr both
+cross every service-to-store edge when a dozen of them share one band, and layout hints can't force
+rows. Keep a data view to about 5 elements. Name the keys so the order reads (`02-Containers`,
+`02b-Data-Booking`, `02c-Data-ReadPath`) and say in each description where the rest is.
 
 **Cross-cutting dependency (telemetry, feature flags, auth sidecar).** When *every* container
 talks to one shared thing, drawing N identical arrows on the main container view is pure
@@ -148,7 +167,9 @@ too.
 - **Filtered views** — derive a focused view by include/exclude on tags, instead of a new
   model: good for "too many elements" on large systems.
 - **Element / relationship styles + themes** — style by tag (`element "Database" { shape cylinder }`);
-  `theme default` for the familiar look; keep styling consistent (the legend is generated).
+  write base styles for the familiar look (`theme default` is dead); installed themes such as
+  `amazon-web-services-2025.07` add provider icons to deployment views; keep styling consistent
+  (the legend is generated). See [structurizr-dsl.md](structurizr-dsl.md#styles-tags-themes).
 - **Custom elements** — for things outside the standard C4 set when genuinely needed.
 - **Deployment groups** — keep instances of separate environments/tenants from wiring
   together in deployment views.
@@ -174,7 +195,8 @@ Prefer these built-ins over hand-maintaining duplicate diagrams — one model, m
   deployment view; the container diagram is logical.
 - **External systems omitted** — if it's not owned but is depended on, show it (tagged
   external). "No external systems" is almost always wrong.
-- **Too many elements** — split into multiple views, use groups, or a filtered view.
+- **Too many elements** — split into multiple views (request path vs per-store-group data views),
+  use groups, or a filtered view.
 - **Unexplained acronyms / generic names** ("business logic", "backend") — name the real
   responsibility.
 - **No legend / inconsistent notation** — colours and shapes must be consistent and

@@ -45,7 +45,7 @@ a **generated** landscape. This is what the docs recommend at multi-team scale.
 workspaces/
 ├── system-catalog/workspace.dsl   every softwareSystem, DEFINITIONS ONLY (no containers)
 ├── _shared/styles.dsl             one styles block, !included by every workspace
-├── <system>/workspace.dsl         one PER SYSTEM: extends the catalog, adds its own
+├── {system}/workspace.dsl         one PER SYSTEM: extends the catalog, adds its own
 │                                  containers + the relationships it ORIGINATES, + views
 └── landscape/                     GENERATED from the per-system workspaces (see pipeline)
 ```
@@ -68,8 +68,8 @@ workspace extends ../system-catalog/workspace.dsl {
     views {
         systemContext <catalogId> "Context" { include *; autolayout lr }
         container     <catalogId> "Containers" { include *; exclude obsPlatform; autolayout lr }
+        # base styles live here; never `theme default` (dead host)
         !include ../_shared/styles.dsl
-        theme default
     }
 }
 ```
@@ -90,7 +90,7 @@ The landscape is **generated**, never hand-authored — that's the point of dece
 
 ```bash
 # 1. merge per-system workspaces; DERIVE system→system edges from each team's container edges
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   generate system-landscape -i /work -o /work/landscape/_generated.json \
   -exclude 'workspace\.json' -relationships first
 
@@ -99,7 +99,7 @@ docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
 #     list the system ids you want — e.g. exclude the Platform systems for the clean view)
 
 # 3. render
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace landscape/workspace.json -format plantuml -output landscape/exports
 ```
 

@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-1
+expected_outcome: |
+  Runs the pre-generation scoping grill (audience, system-in-scope, actors, external systems, level) before emitting DSL
+  Produces valid Structurizr DSL with one model and System Context + Container views
+  Classifies the SPA/API/DB as C4 containers with technologies, and the SMTP/email as an external software system
+  Validates the DSL (MCP tools, or headless `structurizr/structurizr validate`) and previews the result

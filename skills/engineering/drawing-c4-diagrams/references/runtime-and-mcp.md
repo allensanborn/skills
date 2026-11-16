@@ -8,7 +8,7 @@ This skill uses local Structurizr runtimes with different jobs:
   edit layout in a browser at `http://localhost:8080`. (This is what used to be Structurizr Lite.)
 - **`structurizr/structurizr` headless subcommands** (`validate` / `export` / `inspect` /
   `generate`) — the **headless workhorse** and the **practical default whenever Docker is
-  present**: `validate` the DSL, export Mermaid/PlantUML → rasterise to PNG/SVG, `inspect` (model
+  present**: `validate` the DSL, render PNG/SVG (own layout, or Mermaid/PlantUML → rasterise), `inspect` (model
   lint), `generate system-landscape`. No MCP server, no browser. See
   [Headless export](#headless-export-no-mcp-no-browser).
 
@@ -65,7 +65,8 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
 
 1. Probe: is `docker` on PATH? Is a browser available? Is an MCP server reachable?
 2. Ask the user which tier they want. **Prefer Docker** when offering to install tooling:
-   - Tier 1 → `docker pull structurizr/structurizr`
+   - Tier 1 → `docker pull structurizr/structurizr:<release>-playwright` (e.g. `2026.10.26-playwright`;
+     the only variant that can export PNG/SVG — see below)
    - Tier 2 → also `docker pull structurizr/mcp` (MCP is still a **separate image**)
 3. Ask where diagrams should live (default `docs/architecture/`).
 4. Ask whether the post-generation review grill is on (default: on).
@@ -81,12 +82,13 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
   "tier": 2,
   "diagramDir": "docs/architecture",
   "mcp": { "mode": "local-docker", "url": "http://localhost:3000/mcp" },
-  "lite": { "port": 8080 },
+  "local": { "port": 8080 },
   "reviewGrill": true
 }
 ```
 
-`mcp.mode` is `local-docker` | `public` | `none`. `tier` is `0` | `1` | `2`.
+`mcp.mode` is `local-docker` | `public` | `none`. `tier` is `0` | `1` | `2`. `local.port` is the
+`structurizr/structurizr local` port; older configs call that key `lite`, so read `lite` as `local`.
 
 ## Tier 2 — MCP inner loop
 
@@ -123,11 +125,18 @@ Then, after every DSL edit, call the fully-qualified tools:
 Render the real diagrams and let the user adjust layout:
 
 ```bash
-docker pull structurizr/structurizr
 docker run -it --rm -p 8080:8080 \
+  -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
   -v "$(pwd)/docs/architecture:/usr/local/structurizr" \
-  structurizr/structurizr local
+  structurizr/structurizr:2026.10.26-playwright local
 ```
+
+- **Keep `-e STRUCTURIZR_THEMES=…`.** Without it `local` looks for themes in
+  `/usr/local/structurizr/themes/`, and a workspace using an installed theme (e.g.
+  `theme amazon-web-services-2025.07`) fails to load: *"Theme … does not exist"* in the logs.
+  With it, the startup log lists all 16 themes and the browser draws the icons (verified
+  2026-11-16 by exporting PNGs from the running page with `export -format png -url
+  http://host.docker.internal:8080/workspace/1/diagrams`).
 
 - Mount the configured diagram dir to `/usr/local/structurizr`; `local` reads
   `workspace.dsl` there and serves the diagrams at `http://localhost:8080`.
@@ -142,19 +151,25 @@ docker run -it --rm -p 8080:8080 \
 
 When you have Docker but no MCP server and don't want the browser (common: rendering images
 into a repo from a CI-like flow), the same `structurizr/structurizr` image exports views
-directly from the DSL. This is the reliable way to produce committable diagrams at Tier 2.
+directly from the DSL. This is the reliable way to produce committable diagrams at Tier 1 and up.
+
+**Preferred for committed images: Structurizr's own PNG/SVG export** (better layout than PlantUML;
+see [below](#png-and-svg-with-structurizrs-own-layout-preferred)). The PlantUML pipeline in the next
+block is the fallback when you cannot use the `-playwright` image.
 
 ```bash
 cd docs/architecture   # the dir holding workspace.dsl
 
-# 0. validate the DSL — the purpose-built check; do this before exporting
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+# 0. validate the DSL — the purpose-built check; do this before exporting.
+#    Keep STRUCTURIZR_THEMES on every command: without it a workspace using an installed theme
+#    (e.g. amazon-web-services-2025.07) fails to parse ("Theme ... does not exist").
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   validate -workspace workspace.dsl
 
-# 1. DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+# 1. (fallback path) DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace workspace.dsl -format mermaid  -output exports
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace workspace.dsl -format plantuml -output exports
 
 # 2. PlantUML -> PNG + SVG (rasterise; needs no network)
@@ -172,8 +187,10 @@ Notes:
   the DSL. `validate` catches parse errors; `inspect` is the separate **model lint** on top.
 - Structurizr's Mermaid uses HTML `<div>` labels; they render in most Mermaid viewers but can
   look rough on GitHub. For diagrams embedded in a repo README, prefer the **PNG/SVG** output.
-- The export needs the cloud theme only for exact colours; if `theme default` can't be fetched
-  offline the export still succeeds with fallback styling.
+- Never use `theme default`: its host died with the cloud service; export logs an EOL warning
+  and renders unstyled. Write base styles; for provider icons use an **installed** theme (needs
+  `-e STRUCTURIZR_THEMES=/usr/local/structurizr-themes`) — see
+  [structurizr-dsl.md](structurizr-dsl.md#cloud-icon-themes-aws-azure-gcp-oci-kubernetes).
 - **Everything in the prebuilt image is free except `server`.** vNext moved to an **open core**
   model. Free and open source: the CLI functionality (`push`, `pull`, `export`, …), `local`, and
   `playground`. Only `server` — standing up **your own** Structurizr server — is gated. Per
@@ -202,11 +219,50 @@ Notes:
   `exclude`s the platform tag), not one base + a filtered derivative. Both are fine when the
   audience browses the live Structurizr server instead.
 
+### PNG and SVG with Structurizr's own layout (preferred)
+
+`export -format png|svg` runs Structurizr's own renderer (the same Dagre layout as `local`) in headless
+Chromium via Playwright. **The default `structurizr/structurizr` tags cannot do it**: they accept the
+flag, then fail with *"Exporting to PNG/SVG is not supported in this build"*. Since 2026.04.19
+Structurizr publishes an official **`<release>-playwright`** tag (Microsoft's Playwright Java base +
+the same war + the bundled themes) that can. Pin the release:
+
+```bash
+img=structurizr/structurizr:2026.10.26-playwright   # newest *-playwright tag on Docker Hub
+run() { docker run --rm --ipc=host -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
+          -v "$PWD:/work" -w /work "$img" "$@"; }
+cd docs/architecture
+run validate -workspace workspace.dsl
+run export -workspace workspace.dsl -format png -output exports
+run export -workspace workspace.dsl -format svg -output exports
+```
+
+`STRUCTURIZR_THEMES` only matters if the DSL uses an installed theme (e.g. AWS icons); it is harmless
+otherwise. In zsh, pass `-e` and its value as separate words — a `$T="-e …"` variable is not
+word-split, the variable never arrives and `validate` fails with *"Theme … does not exist"*.
+
+Gotchas (all hit for real):
+- **A deployment-view relationship must not end on a deployment node** (only on container /
+  software-system instances or infrastructure nodes). One such edge makes the whole view collapse to a
+  2000x2000 pile of overlapping boxes, with no error, whatever the `autolayout` direction. State
+  "provisioned by X" in the node's description instead, or point the edge at an infrastructure node.
+- **Check the output size.** A fallback of exactly 2000x2000 means the layout failed; the exporter
+  still reports success.
+- **Each PNG carries a render-time footer**, so every re-render changes every image even when the
+  model did not. Restore unchanged images (`git checkout`) before committing, or accept the noise.
+- **`filtered` views still fail headless**: the base view cannot have `autolayout` ("not supported for
+  filtered views"), and without autolayout there is no layout. Author two explicit views instead.
+- Verified on `2026.10.26-playwright` (2026-11-13), including an AWS-themed deployment view whose
+  icons render in the PNG, the SVG (base64-embedded) and the key. The earlier build-from-source
+  recipe (Maven stage + `mcr.microsoft.com/playwright/java`) is only needed for an unreleased
+  commit. Output files are named `<view-key>.png`
+  (no `structurizr-` prefix, unlike the PlantUML path), plus `<view-key>-key.png` for the legend.
+
 ## Image source: PlantUML vs Structurizr's own layout
 
 Two ways to get images, with a real quality/capability tradeoff:
 
-- **Headless export → PlantUML/Mermaid** (the pipeline above). These do their **own layout**, so
+- **Headless export → PlantUML/Mermaid** (the fallback pipeline). These do their **own layout**, so
   images are **regenerable with zero drift** — ideal for CI and repo-committed diagrams. Cost: the
   layout is PlantUML's (rougher on dense diagrams — reduce edges by excluding cross-cutting rather
   than fight it), and **`filtered` views / `perspectives` don't render at all** on this path.
@@ -220,8 +276,10 @@ Two ways to get images, with a real quality/capability tradeoff:
   past attempt was abandoned because the automatic layout was a mess, it is worth re-trying. Don't
   offer Graphviz as a UI layout option; it still exists but is no longer wired into the UI.
 
-Default to **headless PlantUML for committed images**; use the Structurizr renderer for a polished
-one-off, interactive layout tweaks, or when you need filtered/perspective views.
+Default to **headless Structurizr PNG/SVG for committed images** (the container build above: same
+renderer as `local`, still regenerable, no browser session); fall back to headless PlantUML when that
+image cannot be built. Use `local` for interactive layout tweaks or when you need filtered/perspective
+views.
 
 ## Tier 0 — no tools
 

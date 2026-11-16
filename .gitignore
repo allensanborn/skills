@@ -5,6 +5,7 @@ node_modules/
 .c4-diagrams.json
 # eval run artifacts
 **/evals/runs/
+**/evals/results/
 **/exports/
 
 # Beads / Dolt files (added by bd init)
