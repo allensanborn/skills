@@ -10,11 +10,11 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 STRUCTURIZR=structurizr/structurizr:2026.10.26-playwright
 PLANTUML=plantuml/plantuml:1.2026.10
 MERMAID=minlag/mermaid-cli:12.0.0
-THEME_URL=https://raw.githubusercontent.com/structurizr/structurizr/main/structurizr-themes/amazon-web-services-2025.07/theme.json
+# Pinned to the structurizr/structurizr release tag matching $STRUCTURIZR, so upstream pushes cannot change results
+THEME_URL=https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json
 
 WORK="${1:-$(mktemp -d)}"
 mkdir -p "$WORK"
-chmod 777 "$WORK" # mermaid-cli writes as its own user; `-u` instead crashes its Chrome
 cp "$HERE/aws-deployment.dsl" "$WORK/installed.dsl"
 sed "s#theme amazon-web-services-2025.07#theme $THEME_URL#" "$HERE/aws-deployment.dsl" >"$WORK/url.dsl"
 
@@ -46,7 +46,7 @@ check "Mermaid: icons on infrastructure nodes only" 3 "$(count "<img src='https:
 echo "== rendering the URL-theme exports"
 dockerq "$PLANTUML" -tsvg url/plantuml/structurizr-Deployment.puml
 check "PlantUML SVG embeds every fetched icon" 9 "$(count 'xlink:href="data:image/png' "$WORK/url/plantuml/structurizr-Deployment.svg")"
-dockerq "$MERMAID" -i url/mermaid/structurizr-Deployment.mmd -o url/mermaid/structurizr-Deployment.svg
+dockerq -u "$(id -u):$(id -g)" -e HOME=/tmp "$MERMAID" -i url/mermaid/structurizr-Deployment.mmd -o url/mermaid/structurizr-Deployment.svg
 check "Mermaid SVG links 3 icons (remote URLs, need network to view)" 3 "$(count '<img src="https://' "$WORK/url/mermaid/structurizr-Deployment.svg")"
 
 echo "== $pass passed, $fail failed (output: $WORK)"

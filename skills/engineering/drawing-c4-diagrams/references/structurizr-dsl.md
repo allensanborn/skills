@@ -314,7 +314,7 @@ The text exporters only emit icons whose URL starts with `http`; an **installed*
 by URL** — Structurizr's GitHub copy works (relative icon names resolve against it):
 
 ```
-        theme https://raw.githubusercontent.com/structurizr/structurizr/main/structurizr-themes/amazon-web-services-2025.07/theme.json
+        theme https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json
 ```
 
 | Export | Icons with the URL theme |
@@ -323,8 +323,9 @@ by URL** — Structurizr's GitHub copy works (relative icon names resolve agains
 | `-format plantuml/c4plantuml` | **None** on deployment views: the exporter writes every `Deployment_Node` with `$tags=""`, so the tag sprites never attach. |
 | `-format mermaid` | **Infrastructure nodes only**, and only with `properties { "mermaid.icons" "true" }`. Deployment nodes become subgraphs with no icon; icons stretch to node width; the SVG keeps remote `<img>` URLs (blank offline). |
 
-Costs of the URL theme: network at export/render time, and `main` can move — pin a commit SHA in
-the URL for reproducible output. Prefer the installed theme + PNG/SVG export; use the URL theme only
+Costs of the URL theme: network at export/render time. The URL above is pinned to the release tag
+that matches the Docker image, so output stays reproducible; bump both together and re-run
+`evals/render/test.sh`. Prefer the installed theme + PNG/SVG export; use the URL theme only
 when PlantUML output is required. `evals/render/test.sh` asserts all of this (Docker + network).
 
 ```

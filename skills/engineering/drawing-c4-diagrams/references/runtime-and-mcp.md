@@ -124,11 +124,18 @@ Then, after every DSL edit, call the fully-qualified tools:
 Render the real diagrams and let the user adjust layout:
 
 ```bash
-docker pull structurizr/structurizr
 docker run -it --rm -p 8080:8080 \
+  -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
   -v "$(pwd)/docs/architecture:/usr/local/structurizr" \
-  structurizr/structurizr local
+  structurizr/structurizr:2026.10.26-playwright local
 ```
+
+- **Keep `-e STRUCTURIZR_THEMES=…`.** Without it `local` looks for themes in
+  `/usr/local/structurizr/themes/`, and a workspace using an installed theme (e.g.
+  `theme amazon-web-services-2025.07`) fails to load: *"Theme … does not exist"* in the logs.
+  With it, the startup log lists all 16 themes and the browser draws the icons (verified
+  2026-11-16 by exporting PNGs from the running page with `export -format png -url
+  http://host.docker.internal:8080/workspace/1/diagrams`).
 
 - Mount the configured diagram dir to `/usr/local/structurizr`; `local` reads
   `workspace.dsl` there and serves the diagrams at `http://localhost:8080`.
