@@ -159,6 +159,20 @@ Deployment views map container **instances** onto infrastructure:
 `tool -> region` (to say "provisions everything inside") compiles and exports, but collapses the
 rendered view into a 2000x2000 pile. Put that fact in the node's description instead.
 
+Two more deployment parse rules (both verified on 2026.10.26):
+- **An `infrastructureNode` must sit inside a `deploymentNode`**, never directly in the
+  `deploymentEnvironment` ("Unexpected tokens (expected: group, deploymentGroup, deploymentNode, ->)").
+  Put Route 53, CloudFront, WAF and similar inside the cloud/account node.
+- **Under `!identifiers hierarchical`, deployment edges need full paths**: `live.aws.dns -> live.aws.region.alb`,
+  not `dns -> alb` (*"The source element "dns" does not exist"*).
+
+**Implied relationships take one child's label.** With implied relationships on (the default), a
+component-level edge `web -> api.auth "Signs users in through"` also creates `web -> api` with **that same
+description**, and the first component edge wins. Container and context views then show a narrow,
+misleading label. Whenever two containers (or systems) talk through several components, add the
+container-level edge yourself, **before** the component edges: `web -> api "Makes API calls to" "JSON/HTTPS"`.
+The render-and-look pass is where this shows up.
+
 ## View contents: include / exclude, expressions, and layout
 
 `include`/`exclude` decide *what* a view shows. This is where most "the diagram is wrong"

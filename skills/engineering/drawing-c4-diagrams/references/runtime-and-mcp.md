@@ -159,14 +159,16 @@ block is the fallback when you cannot use the `-playwright` image.
 ```bash
 cd docs/architecture   # the dir holding workspace.dsl
 
-# 0. validate the DSL — the purpose-built check; do this before exporting
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+# 0. validate the DSL — the purpose-built check; do this before exporting.
+#    Keep STRUCTURIZR_THEMES on every command: without it a workspace using an installed theme
+#    (e.g. amazon-web-services-2025.07) fails to parse ("Theme ... does not exist").
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   validate -workspace workspace.dsl
 
 # 1. (fallback path) DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace workspace.dsl -format mermaid  -output exports
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace workspace.dsl -format plantuml -output exports
 
 # 2. PlantUML -> PNG + SVG (rasterise; needs no network)

@@ -20,7 +20,9 @@ Based on Simon Brown's C4 model (c4model.com).
 
 Run this **before drawing anything**. These questions are hard to skip on purpose —
 they pin down what people always leave implicit. Ask them in order, one at a time, each
-with a recommended answer.
+with a recommended answer. Before the first one, say in a line which questions are coming
+(audience, system, one system or many, people, externals, level) so the user knows how long
+this takes and nothing gets silently dropped.
 
 1. **Audience & decision**
    > "Who is the audience for this diagram, and what decision or conversation should it
@@ -36,20 +38,26 @@ with a recommended answer.
    > usually one repo / one team boundary. Not a product domain, a business capability,
    > or a team.
 
-3. **People / actors**
+3. **Workspace scope (one system or many)**
+   > "Is this one software system, or several, possibly owned by different teams or repos?"
+   > *Recommended:* {one system, one workspace}: Structurizr's default is one software system
+   > per workspace. If it's several, size it before authoring (one landscape workspace vs the
+   > per-system enterprise pattern) with multi-system-and-enterprise.md.
+
+4. **People / actors**
    > "Who are the people, roles, or personas that use {system}? Include non-human actors
    > (schedulers, other teams' operators) if they initiate interactions."
    > *Recommended:* {the primary end-user role, plus any admin/operator role}. List each
    > distinct role separately rather than lumping them into "users".
 
-4. **External system dependencies**
+5. **External system dependencies**
    > "What external software systems does {system} depend on, or which depend on it?
    > (auth providers, payment gateways, email/SMS, upstream data feeds, downstream
    > consumers.)"
    > *Recommended:* {name each integration you send data to or receive data from}. If in
    > doubt, include it — omitted external systems are the most common scoping defect.
 
-5. **C4 level(s) to draw now**
+6. **C4 level(s) to draw now**
    > "Which level are we drawing right now — System Context (the world around {system}),
    > Container (apps and data stores inside it), or Component (inside one container)?
    > We draw one level per diagram."

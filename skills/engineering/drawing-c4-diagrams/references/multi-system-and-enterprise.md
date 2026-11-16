@@ -90,7 +90,7 @@ The landscape is **generated**, never hand-authored — that's the point of dece
 
 ```bash
 # 1. merge per-system workspaces; DERIVE system→system edges from each team's container edges
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   generate system-landscape -i /work -o /work/landscape/_generated.json \
   -exclude 'workspace\.json' -relationships first
 
@@ -99,7 +99,7 @@ docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
 #     list the system ids you want — e.g. exclude the Platform systems for the clean view)
 
 # 3. render
-docker run --rm -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
   export -workspace landscape/workspace.json -format plantuml -output landscape/exports
 ```
 
