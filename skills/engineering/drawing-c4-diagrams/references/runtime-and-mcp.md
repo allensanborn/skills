@@ -82,12 +82,13 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
   "tier": 2,
   "diagramDir": "docs/architecture",
   "mcp": { "mode": "local-docker", "url": "http://localhost:3000/mcp" },
-  "lite": { "port": 8080 },
+  "local": { "port": 8080 },
   "reviewGrill": true
 }
 ```
 
-`mcp.mode` is `local-docker` | `public` | `none`. `tier` is `0` | `1` | `2`.
+`mcp.mode` is `local-docker` | `public` | `none`. `tier` is `0` | `1` | `2`. `local.port` is the
+`structurizr/structurizr local` port; older configs call that key `lite`, so read `lite` as `local`.
 
 ## Tier 2 — MCP inner loop
 
@@ -150,7 +151,7 @@ docker run -it --rm -p 8080:8080 \
 
 When you have Docker but no MCP server and don't want the browser (common: rendering images
 into a repo from a CI-like flow), the same `structurizr/structurizr` image exports views
-directly from the DSL. This is the reliable way to produce committable diagrams at Tier 2.
+directly from the DSL. This is the reliable way to produce committable diagrams at Tier 1 and up.
 
 **Preferred for committed images: Structurizr's own PNG/SVG export** (better layout than PlantUML;
 see [below](#png-and-svg-with-structurizrs-own-layout-preferred)). The PlantUML pipeline in the next

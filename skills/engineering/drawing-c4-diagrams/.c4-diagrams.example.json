@@ -2,6 +2,6 @@
   "tier": 2,
   "diagramDir": "docs/architecture",
   "mcp": { "mode": "local-docker", "url": "http://localhost:3000/mcp" },
-  "lite": { "port": 8080 },
+  "local": { "port": 8080 },
   "reviewGrill": true
 }

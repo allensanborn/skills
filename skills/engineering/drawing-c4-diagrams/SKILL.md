@@ -22,7 +22,7 @@ Copy this checklist and work top to bottom:
 - [ ] 0. Load capability config (or run setup) and locate the workspace
 - [ ] 1. SCOPE — pre-generation grill (hard to skip)
 - [ ] 2. AUTHOR — generate/extend Structurizr DSL (from words or a pasted image)
-- [ ] 3. VALIDATE + PREVIEW — inner loop (MCP; Mermaid preview)
+- [ ] 3. VALIDATE + PREVIEW — inner loop (MCP if connected, else headless `validate`)
 - [ ] 4. RENDER — outer loop (`structurizr/structurizr local` at :8080), if the user wants it
 - [ ] 5. REVIEW — render-and-look (always) + post-generation grill (skippable), then export
 ```
@@ -101,11 +101,12 @@ Docker-container-vs-C4-container or infra-vs-software-system confusion) before e
 
 ## 3. VALIDATE + PREVIEW — the inner loop
 
-After every DSL edit, if MCP is available, validate and preview **before** showing the
-user (validator → fix → repeat):
+After every DSL edit, validate and preview **before** showing the user (validator → fix →
+repeat):
 
-- Validate/parse with `structurizr-mcp:*` DSL tools.
-- Export a **Mermaid** view for an inline preview (renders in chat/Markdown, no browser).
+- **Validate:** with MCP connected, the `structurizr-mcp:*` DSL tools; otherwise (Tier 1) the headless
+  `validate` below.
+- **Preview:** with MCP, export a **Mermaid** view inline (renders in chat/Markdown, no browser).
 - **Verify each view isn't empty.** Parsing OK ≠ view correct — a misscoped `include`/`exclude`
   renders **0 elements**. Check the per-view element/relationship counts (from the exported
   `workspace.json`) before moving on.
