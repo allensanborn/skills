@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-5
+expected_outcome: |
+  Still runs the hard-to-skip pre-generation scoping essentials
+  Honors 'skip the grill' for the POST-generation CONTENT grill only — still renders and eyeballs the result
+  Produces valid DSL with the queue modelled as a container with a technology

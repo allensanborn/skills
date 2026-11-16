@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-7
+expected_outcome: |
+  Assesses scope up front and recognizes this is multi-system / multi-team, not one workspace
+  Recommends the enterprise pattern (one software-system-scoped workspace per system + a shared system catalog they `extends`, plus a generated landscape) rather than cramming everything into one workspace
+  Notes the landscape can be GENERATED locally with `generate system-landscape` (needs `!impliedRelationships true`; no server/license), and that only the hosted server + create/push/pull are license-gated

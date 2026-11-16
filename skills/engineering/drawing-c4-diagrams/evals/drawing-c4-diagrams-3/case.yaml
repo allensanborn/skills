@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-3
+expected_outcome: |
+  Does NOT invent scope; grills for audience, boundary, actors, and externals first
+  Also assesses whether this is one system or many (workspace scope) before authoring
+  Refuses to proceed to DSL until the scoping questions are answered
