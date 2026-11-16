@@ -79,6 +79,11 @@ skip these. You are pinning what people always leave ambiguous:
 This is the step that stops "boxes and lines that mean different things to different
 people." Do not proceed to DSL until these are answered.
 
+**If the user says "skip the grill"** (or "just give me the DSL"), don't ask, and don't silently guess
+either: open with a short **Assumptions** list covering the same points (audience, system in scope,
+one system or many, people, externals, level), then author. The scope stays visible and correctable
+without a round trip. Skipping the grill never skips the render-and-look pass in step 5.
+
 ## 2. AUTHOR — generate the Structurizr DSL
 
 Write or extend `workspace.dsl` following [references/structurizr-dsl.md](references/structurizr-dsl.md).
