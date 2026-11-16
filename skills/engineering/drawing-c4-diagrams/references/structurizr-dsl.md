@@ -301,10 +301,12 @@ installed names drop the day.
 - Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the
   generated key too.
 - The theme supplies icons only; keep your base styles alongside it.
-- **Licensing:** the icons belong to the vendors (Structurizr licenses only `theme.json`). Using them
-  in diagrams of that vendor's services is what every vendor intends. Azure forbids cropping,
-  flipping, rotating or distorting its icons and using them for your own product. Never copy icon
-  files into the user's repo; reference the theme. Details: the skills repo's
+- **Licensing:** the icons belong to the vendors (Structurizr licenses only `theme.json`). Vendors
+  invite diagrams of *their own services*, but only Kubernetes grants a real licence. AWS grants
+  nothing for third-party publications, and AWS/Oracle terms bar redistribution. Never copy icon
+  files into a repo; reference a theme. Don't distort icons (AWS §9, Azure, Oracle), which is a
+  strike against Mermaid's stretched icons. Google Cloud wants an attribution line. If the user
+  will publish commercially, tell them to check the vendor's terms. Details: the skills repo's
   `docs/architecture/README.md`.
 
 ### Icons outside the Structurizr renderer (PlantUML, Mermaid)
