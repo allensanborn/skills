@@ -16,7 +16,7 @@ while IFS= read -r -d '' skill_md; do
   src="$(dirname "$skill_md")"
   names+=("$(basename "$src")")
   srcs+=("$src")
-done < <(find "$REPO/skills" -name SKILL.md -not -path '*/deprecated/*' -print0)
+done < <(find "$REPO/skills" -name SKILL.md -not -path '*/deprecated/*' -not -path '*/misc/*' -print0)
 
 fail=0
 for DEST in "${DESTS[@]}"; do
