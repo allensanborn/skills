@@ -2,12 +2,13 @@
 
 Structurizr DSL is a text notation for the [C4 model](c4-model.md): you define **one
 model** and render **many views** from it. That single-source-of-truth property is the
-whole point — never hand-draw diagrams that can drift from each other.
+whole point. Never hand-draw diagrams that can drift from each other.
 
 Always validate DSL with the MCP tools after editing (see [runtime-and-mcp.md](runtime-and-mcp.md));
 the authoritative grammar is at docs.structurizr.com/dsl. Below is the working subset.
 
 ## Contents
+
 - Skeleton
 - Model elements (person, softwareSystem, container, component)
 - Relationships
@@ -17,14 +18,14 @@ the authoritative grammar is at docs.structurizr.com/dsl. Below is the working s
 
 ## Skeleton
 
-```
+```text
 workspace "Name" "Optional description" {
     model {
         # elements and relationships
     }
     views {
         # one view per C4 level you want to show
-        # styles { ... } — see "Styles, tags, themes" (never `theme default`: it is dead)
+        # styles { ... }: see "Styles, tags, themes" (never `theme default`: it is dead)
     }
 }
 ```
@@ -33,7 +34,7 @@ workspace "Name" "Optional description" {
 
 Identifiers (left of `=`) are how you wire relationships and choose what a view shows.
 
-```
+```text
 model {
     user = person "Customer" "A user of the bank."
 
@@ -57,20 +58,20 @@ model {
 }
 ```
 
-- **person** — a human role/actor.
-- **softwareSystem** — the highest abstraction; the thing in scope, or an external
+- **person**: a human role/actor.
+- **softwareSystem**: the highest abstraction; the thing in scope, or an external
   dependency (tag externals so they can be styled differently).
-- **container** — a separately deployable/runnable unit (app, service, SPA, data store).
+- **container**: a separately deployable/runnable unit (app, service, SPA, data store).
   **Not** a Docker container. Give every container a **technology** (the 4th argument).
-- **component** — a grouping of related functionality *inside* one container. Optional
+- **component**: a grouping of related functionality *inside* one container. Optional
   and often auto-generated; keep it current or omit it.
 
 ## Relationships
 
-`source -> destination "Description" "Technology"` — always describe intent, and add the
+`source -> destination "Description" "Technology"`. Always describe intent, and add the
 technology/protocol where it matters.
 
-```
+```text
     user -> spa "Uses"
     spa -> api "Makes API calls to" "JSON/HTTPS"
     api -> db "Reads from and writes to" "SQL/TCP"
@@ -78,34 +79,34 @@ technology/protocol where it matters.
     api -> email "Sends e-mail using" "SMTP"
 ```
 
-**Tagging a relationship** (to style or filter it later — e.g. async, telemetry, feature
+**Tagging a relationship** (to style or filter it later, e.g. async, telemetry, feature
 flags): the tag is the **5th positional argument**, after description and technology:
 
-```
+```text
     api -> broker "Publishes OrderPlaced to" "Kafka" "Async"
 ```
 
-Do **not** put a `{ tags "Async" }` block on the *same line* as the relationship — the parser
+Do **not** put a `{ tags "Async" }` block on the *same line* as the relationship; the parser
 rejects it with `Too many tokens, expected: <identifier> -> <identifier> [description]
 [technology] [tags]`. Use the positional form above, or move the block onto its own lines:
 
-```
+```text
     api -> broker "Publishes OrderPlaced to" "Kafka" {
         tags "Async"
     }
 ```
 
 The same one-line-brace trap applies to **elements**: `softwareSystem "X" { tags "Platform" }` on a
-single line fails the same way. Tags is the last positional argument — `softwareSystem "Name"
-"Description" "Tag"` (person/softwareSystem) or `container "Name" "Description" "Technology" "Tag"` —
-or put a `{ tags "..." }` block on its **own lines**.
+single line fails the same way. Tags is the last positional argument: `softwareSystem "Name"
+"Description" "Tag"` (person/softwareSystem) or `container "Name" "Description" "Technology" "Tag"`.
+Or put a `{ tags "..." }` block on its **own lines**.
 
 ## Views
 
 Render one view per level. `include *` pulls in the relevant elements; always set
 `autolayout` (`tb`, `bt`, `lr`, or `rl`) so it renders without manual layout.
 
-```
+```text
 views {
     systemContext bank "SystemContext" "The big picture." {
         include *
@@ -130,7 +131,7 @@ views {
 
 Deployment views map container **instances** onto infrastructure:
 
-```
+```text
     deploymentEnvironment "Live" {
         deploymentNode "Customer's computer" {
             deploymentNode "Web Browser" {
@@ -147,7 +148,8 @@ Deployment views map container **instances** onto infrastructure:
         }
     }
 ```
-```
+
+```text
     deployment bank "Live" "LiveDeployment" {
         include *
         autolayout lr
@@ -160,6 +162,7 @@ Deployment views map container **instances** onto infrastructure:
 rendered view into a 2000x2000 pile. Put that fact in the node's description instead.
 
 Two more deployment parse rules (both verified on 2026.10.26):
+
 - **An `infrastructureNode` must sit inside a `deploymentNode`**, never directly in the
   `deploymentEnvironment` ("Unexpected tokens (expected: group, deploymentGroup, deploymentNode, ->)").
   Put Route 53, CloudFront, WAF and similar inside the cloud/account node.
@@ -176,57 +179,60 @@ The render-and-look pass is where this shows up.
 ## View contents: include / exclude, expressions, and layout
 
 `include`/`exclude` decide *what* a view shows. This is where most "the diagram is wrong"
-problems live — the mechanics below each correspond to a real failure mode.
+problems live; the mechanics below each correspond to a real failure mode.
 
 **Identifiers.** `include *` pulls in the elements in scope; `include <id> [<id> …]` and
 `exclude <id>` add/remove specific ones. **Excluding an element also removes its
-relationships** — use that to drop a chatty shared dependency (`exclude collector`) and get a
+relationships**: use that to drop a chatty shared dependency (`exclude collector`) and get a
 clean view.
 
 **Expressions.** `include`/`exclude` also take expressions (quote them):
-- `include "->x"` — *afferent*: everything pointing **at** `x`. `"x->"` — *efferent*: everything
+
+- `include "->x"` (*afferent*): everything pointing **at** `x`. `"x->"` (*efferent*): everything
   `x` points at. Also `"* -> x"`, `"x -> *"`.
-- `include "element.tag==Foo"` / `include "relationship.tag==Foo"` (and the `exclude` forms) —
+- `include "element.tag==Foo"` / `include "relationship.tag==Foo"` (and the `exclude` forms):
   filter by tag.
 
 Two expression gotchas, both verified:
+
 - **An expression-only include on an *empty* view can resolve to nothing.** `include "* -> x"`
   or `include "relationship.tag==Foo"` on a view with no baseline may add **zero** elements.
   Seed a concrete element first (`include x`), *then* the afferent form (`include "->x"`).
-- **A view auto-draws *every* relationship between its included elements** — so a "star" view
+- **A view auto-draws *every* relationship between its included elements**, so a "star" view
   around a hub also shows the spokes' business edges to each other. Tag those edges and
   `exclude "relationship.tag==Business"`. Full star-view recipe in
   [patterns-and-pitfalls.md](patterns-and-pitfalls.md).
 
-**Implied relationships** — `!impliedRelationships true` at the top of `model`. A relationship
+**Implied relationships**: `!impliedRelationships true` at the top of `model`. A relationship
 between two containers is rolled up to their parent software systems, so a System Context /
 Landscape view shows **one** clean arrow to each external instead of hand-added duplicates. It's
-also **required** for `generate system-landscape` (the rollup is what the generator merges — see
+also **required** for `generate system-landscape` (the rollup is what the generator merges; see
 [multi-system-and-enterprise.md](multi-system-and-enterprise.md)).
-> **Gotcha:** implied relationships do **not** inherit the source relationship's custom tags —
+> **Gotcha:** implied relationships do **not** inherit the source relationship's custom tags:
 > the implied edge carries only the default `Relationship` tag. So you **cannot** tag-filter
 > implied edges; keep the granular (tagged) relationships explicit if a view needs to filter on
 > them. This is why the star-view recipe filters container-level edges, not implied ones.
 
 **Filtered views** (`filtered "<baseKey>" exclude "<tag>" "<newKey>"`) derive a focused view
 from a base by tag. Two hard limits make them a poor fit for committed images:
-- the **base view must use manual layout** — `autolayout` on a filtered view's base is rejected;
-- the **headless export silently skips filtered views** — only the base is written
+
+- the **base view must use manual layout**: `autolayout` on a filtered view's base is rejected;
+- the **headless export silently skips filtered views**: only the base is written
   ([runtime-and-mcp.md](runtime-and-mcp.md)).
 
 So for repo images, author a "clean" and a "full" view **explicitly** (one `include *`, one that
 `exclude`s the noisy tag/element). Filtered views are fine only when the audience browses the
 live Structurizr server.
 
-**Layout.** `autolayout <lr|rl|tb|bt> [rankSep] [nodeSep]` — e.g. `autolayout lr 300 150` widens
+**Layout.** `autolayout <lr|rl|tb|bt> [rankSep] [nodeSep]`: e.g. `autolayout lr 300 150` widens
 spacing; `tb` often untangles a fan-in that `lr` crowds. But note the **image-source caveat**:
 PlantUML/Mermaid do their *own* layout on export, so `autolayout` mainly drives the interactive
-server — where vNext's upgraded Dagre routes arrows and labels noticeably better than Lite did.
+server, where vNext's upgraded Dagre routes arrows and labels noticeably better than Lite did.
 For a dense view, the fix is still **fewer edges** (exclude the cross-cutting ones), not layout
 knobs.
 
 **Verify before trusting a view.** A misscoped `include`/`exclude` can yield an **empty** view
-(0 elements) that renders as a blank box — a silent failure. Check the per-view element and
+(0 elements) that renders as a blank box: a silent failure. Check the per-view element and
 relationship counts (from the exported `workspace.json`, where **relationships nest under their
 source element**, not a top-level `model.relationships` array) before shipping.
 
@@ -234,7 +240,7 @@ source element**, not a top-level `model.relationships` array) before shipping.
 
 Notation is secondary but must be **consistent and explained** (a legend). Style by tag:
 
-```
+```text
     views {
         styles {
             element "External" {
@@ -254,7 +260,7 @@ The MCP/`local` renderers draw the legend automatically from your styles.
 service (EOL 30 Sep 2026). It still parses; export logs an EOL warning and renders **unstyled**, with
 no error. For the familiar C4 look, write the base styles yourself:
 
-```
+```text
         styles {
             element "Person" {
                 background #08427b
@@ -280,14 +286,14 @@ no error. For the familiar C4 look, write the base styles yourself:
 ```
 
 Set `color` per element type, **never on `"Element"`**: that also hits deployment and infrastructure
-nodes, whose white background then hides every label (verified — invisible text, no error).
+nodes, whose white background then hides every label (verified: invisible text, no error).
 
 ### Cloud icon themes (AWS, Azure, GCP, OCI, Kubernetes)
 
 Provider icons ship **inside** the `structurizr/structurizr` image at `/usr/local/structurizr-themes`;
-reference one by bare name — no URL, no network, no CORS:
+reference one by bare name (no URL, no network, no CORS):
 
-```
+```text
     views {
         theme amazon-web-services-2025.07
     }
@@ -303,14 +309,14 @@ installed names drop the day.
   Without it, `validate`/`export` fail: *"Theme amazon-web-services-2025.07 does not exist at /work/…"*.
   (Alternatively a `themes/` dir next to `workspace.dsl` is used first.)
 - **An element gets an icon by carrying the exact tag** from that version's `theme.json`; tags change
-  between versions. Verified AWS 2025.07 tags for a typical web stack, all prefixed
-  `Amazon Web Services - `: `AWS Cloud`, `Region`, `Virtual private cloud VPC`, `Public subnet`,
+  between versions. Verified AWS 2025.07 tags for a typical web stack, all of the form
+  `Amazon Web Services - <name>`: `AWS Cloud`, `Region`, `Virtual private cloud VPC`, `Public subnet`,
   `Private subnet`, `Route 53`, `CloudFront`, `WAF`, `Load Balancing`, `API Gateway`,
   `Elastic Container Service`, `Fargate`, `Lambda`, `Aurora`, `ElastiCache`,
   `Simple Storage Service`, `OpenSearch Service`, `Simple Queue Service`, `Simple Email Service`,
   `Cognito`. There is no Availability Zone tag. List a version's tags with
   `docker run --rm --entrypoint cat structurizr/structurizr /usr/local/structurizr-themes/<name>/theme.json`.
-- **Icons go on the deployment view only** — tag `deploymentNode`s and `infrastructureNode`s, never
+- **Icons go on the deployment view only**: tag `deploymentNode`s and `infrastructureNode`s, never
   the logical containers (an Aurora icon on the "Database" container conflates C4 levels).
 - Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the
   generated key too.
@@ -327,9 +333,9 @@ installed names drop the day.
 
 The text exporters only emit icons whose URL starts with `http`; an **installed** theme's icons are
 `data:` URIs, so PlantUML and Mermaid silently drop them. To get icons there, load the **same theme
-by URL** — Structurizr's GitHub copy works (relative icon names resolve against it):
+by URL**. Structurizr's GitHub copy works (relative icon names resolve against it):
 
-```
+```text
         theme https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json
 ```
 
@@ -344,7 +350,7 @@ that matches the Docker image, so output stays reproducible; bump both together 
 `evals/render/test.sh`. Prefer the installed theme + PNG/SVG export; use the URL theme only
 when PlantUML output is required. `evals/render/test.sh` asserts all of this (Docker + network).
 
-```
+```text
     deploymentEnvironment "Live" {
         deploymentNode "AWS" {
             tags "Amazon Web Services - AWS Cloud"

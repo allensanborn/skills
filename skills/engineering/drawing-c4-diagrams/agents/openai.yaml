@@ -1,0 +1,3 @@
+interface:
+  display_name: "Drawing C4 Diagrams"
+  short_description: "Draw and grill C4 architecture diagrams"

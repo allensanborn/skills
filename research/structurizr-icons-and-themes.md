@@ -52,7 +52,7 @@ AWS 2025.07 tags for a typical web stack (verified in `theme.json`): `Route 53`,
 `Load Balancing`, `API Gateway`, `Elastic Container Service`, `Fargate`, `Lambda`, `Aurora`,
 `ElastiCache`, `Simple Storage Service`, `OpenSearch Service`, `Simple Queue Service`,
 `Simple Email Service`, `Cognito`, `AWS Cloud`, `Region`, `Virtual private cloud VPC`,
-`Public subnet`, `Private subnet` (all prefixed `Amazon Web Services - `). No Availability Zone tag.
+`Public subnet`, `Private subnet` (all prefixed `"Amazon Web Services - "`). No Availability Zone tag.
 
 ## Where icons render
 
@@ -89,12 +89,12 @@ AWS 2025.07 tags for a typical web stack (verified in `theme.json`): `Route 53`,
 
 ## Sources
 
-- https://docs.structurizr.com/server/diagrams/themes
-- https://docs.structurizr.com/server/diagrams/notation
-- https://docs.structurizr.com/dsl/cookbook/themes/
-- https://docs.structurizr.com/dsl/cookbook/amazon-web-services
-- https://docs.structurizr.com/export
+- <https://docs.structurizr.com/server/diagrams/themes>
+- <https://docs.structurizr.com/server/diagrams/notation>
+- <https://docs.structurizr.com/dsl/cookbook/themes/>
+- <https://docs.structurizr.com/dsl/cookbook/amazon-web-services>
+- <https://docs.structurizr.com/export>
 - github.com/structurizr/structurizr: `structurizr-themes/`, `changelog-*.md`,
   `structurizr-application/Dockerfiles/*`, `AbstractCommand.java`, `ThemeUtils.java`, `ThemeParser.java`
-- https://hub.docker.com/r/structurizr/structurizr/tags
+- <https://hub.docker.com/r/structurizr/structurizr/tags>
 - Third-party: awslabs/aws-icons-for-plantuml ships `dist/aws-icons-structurizr-theme.json`
