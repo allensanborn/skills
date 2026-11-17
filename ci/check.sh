@@ -40,6 +40,9 @@ else
   echo "==> claude plugin validate: skipped (claude CLI not installed)"
 fi
 
+echo "==> plugin.json version matches package.json"
+node scripts/sync-plugin-version.mjs --check
+
 echo "==> skill-lint"
 # Validates SKILL.md name/description limits, allowed frontmatter fields,
 # one-level references, referenced-files-exist, <500 lines.
