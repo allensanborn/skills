@@ -77,6 +77,7 @@ Structurizr's Mermaid export uses HTML labels that render poorly on GitHub. Merm
 - Every arrow on the diagram has a label and a direction.
 - The SPA, API, and database show up as containers with technologies, not as Docker containers or as separate systems.
 - The images you're shown were rendered first: nothing arrives empty or as a hairball.
+- Each diagram reads at the size you'll view it (a README column, a slide). A big deployment arrives as a few focused views, not one poster you have to zoom.
 - `workspace.dsl` is the only source; the context and container views agree because they come from the same model.
 
 ## Where it fits

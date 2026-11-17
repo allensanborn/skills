@@ -106,8 +106,18 @@ the review, not optional.
       `autolayout` direction (`tb` vs `lr`).
 - [ ] **Orphan / disconnected element**: Any box with no relationships (unless it's a
       deliberately standalone actor)? It usually means a missing edge or a wrong-scope include.
-- [ ] **Legibility at size**: Is it readable at the size it will actually be viewed (README
-      thumbnail, slide)? Dense labels that are fine zoomed-in vanish at the real size.
+- [ ] **Legibility at size**: Measure it; don't eyeball the full-size render. Viewers shrink a
+      wide image to fit: a GitHub README column is about **880 px**, a full-screen slide about
+      **1920 px** (if the user hasn't said where it goes, assume a README). Structurizr draws
+      names and relationship labels at 24 px, so labels shrink to `24 × target ÷ image width`
+      px, and below about 7 px they can't be read. That puts the **image width budget at about
+      3× the target**: roughly 2600 px for a README, 5800 px for a slide. Read the width from
+      the export (`file exports/<key>.png`, or the SVG's `width`), and if a resize tool is
+      available (`sips --resampleWidth 880`, ImageMagick) look at the shrunk copy too. Over
+      budget means split the view (see [patterns](patterns-and-pitfalls.md#modeling-patterns-common-use-cases));
+      as a rule of thumb that starts happening past about **12-15 elements**. Wider
+      `autolayout` spacing makes it worse; `tb` is usually narrower than `lr` for a deep
+      nesting of deployment nodes.
 - [ ] **Styling survives the export**: Do the ownership colours, shapes, borders, and legend
       render as intended in the format you're shipping? PlantUML and Mermaid style differently,
       and a generated workspace has **no theme** unless you add one.

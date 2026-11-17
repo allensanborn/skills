@@ -135,7 +135,9 @@ Review has **two passes**, both driven by [references/diagram-review-checklist.m
 1. **Render and look** (not optional): actually render the views (PNG/SVG or the live server)
    and eyeball them against the *Render and look* checklist. DSL validation passes on diagrams
    that are visually broken: empty views, a view that pulled in the whole landscape, hairballs,
-   overlapping boxes, orphans. These are invisible in the source.
+   overlapping boxes, orphans. These are invisible in the source. Judge legibility at the size
+   it will be **viewed**, not the size it was rendered: check each image's width against the
+   budget in the checklist (about 3× the display width) and split any view that's over it.
 2. **The content grill**: walk the **Section C** review questions in the grill bank: challenge
    each box's abstraction level, demand a label + direction for every relationship, flag missing
    externals and omitted technology. Length scales with the diagram, not a fixed count.
