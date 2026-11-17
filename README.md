@@ -43,4 +43,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to report a problem, and for th
 
 ## License
 
-Private during development. To be released under the **MIT License** when ship-ready.
+[MIT](./LICENSE)

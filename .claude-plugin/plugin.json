@@ -7,6 +7,7 @@
     "url": "https://github.com/allensanborn"
   },
   "repository": "https://github.com/allensanborn/skills",
+  "license": "MIT",
   "keywords": ["skills", "architecture", "c4", "structurizr"],
   "skills": [
     "./skills/engineering/drawing-c4-diagrams"
