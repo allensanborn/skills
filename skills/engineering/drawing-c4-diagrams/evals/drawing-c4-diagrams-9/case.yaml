@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-9
+expected_outcome: |
+  Recognizes the cross-cutting fan-in and keeps it OFF the clean container/landscape view (excludes the platform elements) rather than drawing N identical arrows
+  Shows the fan-in in a dedicated star view (seed the hub + afferent `->hub`, then exclude the business edges) and/or on each consumer's own context view
+  Models flagd + the collector as internal Platform software systems (grouped), and treats externality as scope-relative (external from a product team's viewpoint)

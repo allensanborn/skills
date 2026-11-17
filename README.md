@@ -1,44 +1,46 @@
-# skills
+# Skills
 
-A personal, shareable collection of [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
-for Claude Code and compatible agents. Structured like
-[`mattpocock/skills`](https://github.com/mattpocock/skills): one skill per directory under
-`skills/<category>/<skill-name>/`, each with a `SKILL.md` plus optional `references/`,
-`evals/`, and scripts.
+Agent skills for Claude Code and other [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) harnesses, built on the conventions of [mattpocock/skills](https://github.com/mattpocock/skills): small, composable, and each one makes you think rather than doing the thinking for you.
 
-## Skills
+## Installation
 
-### Engineering
+The plugin updates itself on each release. [skills.sh](https://skills.sh) copies editable files into your project, and you update them by hand. Pick one, because installing both gives you every skill twice.
 
-- **[drawing-c4-diagrams](skills/engineering/drawing-c4-diagrams/)** — create and refine
-  C4-model software architecture diagrams as Structurizr DSL, validated and rendered
-  locally (Structurizr MCP + Lite), and *grill* the user Socratically so they engage with
-  and defend the design instead of passively accepting generated output. Bootstraps from a
-  pasted whiteboard/hand-drawn/existing-diagram image.
+<details>
+<summary>Claude Code</summary>
 
-## Install
+```bash
+claude plugin marketplace add allensanborn/skills
+claude plugin install allensanborn-skills@allensanborn
+```
+
+Updates when a new version is released.
+
+</details>
+
+<details>
+<summary>Every other agent, or editable files (skills.sh)</summary>
 
 ```bash
 npx skills@latest add allensanborn/skills
 ```
 
-Or copy a skill directory into your project's `.claude/skills/`.
+Manual updates: run `npx skills@latest update`, and re-run `add` to pick up new skills.
 
-## Develop
+</details>
 
-Skills follow [Anthropic's authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices):
-lean `SKILL.md` (<500 lines), progressive disclosure via `references/` (one level deep),
-third-person "pushy" descriptions, forward-slash paths, evals-first.
+## Available skills
 
-Quality checks run in a container via [Dagger](https://dagger.io) (portable, no metered CI
-minutes) — see [`.dagger/`](.dagger/). GitHub Actions are added only once a skill is
-proven ship-ready.
+### Engineering
 
-```bash
-# local lint (skill-lint + reference link check)
-bash ci/check.sh
-```
+#### Model-invoked
+
+- **[drawing-c4-diagrams](./skills/engineering/drawing-c4-diagrams/SKILL.md)**: Create and refine C4 architecture diagrams as Structurizr DSL, validated and rendered locally, while grilling you so you defend the design instead of accepting generated boxes. [Docs](./docs/engineering/drawing-c4-diagrams.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to report a problem, and for the maintainer guide (checks, Dagger, beads). Scope is in [SCOPE.md](./SCOPE.md).
 
 ## License
 
-Private during development. To be released under the **MIT License** when ship-ready.
+[MIT](./LICENSE)

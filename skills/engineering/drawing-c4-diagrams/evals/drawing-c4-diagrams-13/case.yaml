@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-13
+expected_outcome: |
+  Runs the scoping grill first (audience, system in scope, actors, externals, levels) instead of jumping to DSL
+  Keeps System Context and Container views logical: AWS services appear only on the deployment view, as deployment/infrastructure nodes, never as tags or icons on C4 containers
+  Uses an installed theme by name (e.g. `theme amazon-web-services-2025.07`), never a `static.structurizr.com` URL and never `theme default`
+  Tags each deployment/infrastructure node with the exact tag from that theme version's theme.json (e.g. `Amazon Web Services - CloudFront`, `Amazon Web Services - Aurora`), not guessed names
+  Runs validate/export on the `structurizr/structurizr:<release>-playwright` image with `-e STRUCTURIZR_THEMES=/usr/local/structurizr-themes`, and exports PNG/SVG (not Mermaid/PlantUML) for the icon diagram
+  Ends deployment relationships on container instances or infrastructure nodes, never on a deployment node
+  Renders and looks before showing: icons visible, every node label readable (no `color` set on "Element"), deployment view not a 2000x2000 fallback
+  Notes licensing: icons belong to AWS, fine for diagrams of AWS services, never copies icon PNGs into the repo, and flags checking AWS terms before commercial publication

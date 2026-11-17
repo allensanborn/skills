@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-11
+expected_outcome: |
+  Points at the free open-source playground at `playground.structurizr.com` (not the old structurizr.com/dsl URL, and not the cloud service)
+  Says plainly that the Structurizr cloud service is end-of-life with no replacement, so signing up is not the move
+  Offers the self-hosted alternatives for later: `structurizr/structurizr playground` or `local` for free local use, `server` (licensed) for publishing to a team
+  Does NOT claim push/pull require a commercial license. Only `server` does

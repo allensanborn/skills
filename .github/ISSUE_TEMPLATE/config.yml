@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Is my request out of scope?
+    url: https://github.com/allensanborn/skills/blob/main/SCOPE.md
+    about: The bar every issue must clear, and the requests this repo has already decided not to take.

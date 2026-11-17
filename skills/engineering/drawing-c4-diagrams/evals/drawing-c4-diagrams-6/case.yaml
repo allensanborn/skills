@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-6
+expected_outcome: |
+  Does NOT assume MCP; uses the headless path: `structurizr/structurizr export` (DSL -> PlantUML) then rasterise PlantUML -> PNG/SVG
+  Runs `validate` (or treats a failed export) as the validation signal; verifies each view is non-empty via the exported workspace.json counts
+  Prefers PNG/SVG over Mermaid for repo-committed images (Structurizr Mermaid uses HTML labels that render poorly on GitHub)
