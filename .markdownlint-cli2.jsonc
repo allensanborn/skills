@@ -8,5 +8,7 @@
     "MD060": false,
     "MD033": { "allowed_elements": ["details", "summary", "canonical-block", "page-template"] }
   },
-  "ignores": ["node_modules/**", ".beads/**", ".dagger/**", "CHANGELOG.md", ".changeset/README.md"]
+  // docs/examples/: model-written files are kept verbatim; the sample READMEs are still linted.
+  "ignores": ["node_modules/**", ".beads/**", ".dagger/**", "CHANGELOG.md", ".changeset/README.md",
+    "docs/examples/**/docs/**", "docs/examples/**/adrs/**", "docs/examples/**/VIEWS.md"]
 }
