@@ -1,6 +1,30 @@
 # Contributing
 
-Maintainer guide: how this repo is built, checked, and tracked. Outside reports go through the routes in the next section once the repo is public.
+Every issue is judged against the bar in [`SCOPE.md`](./SCOPE.md). Read it first.
+
+## Where each request goes
+
+| You have | Go to |
+| --- | --- |
+| A bug in a skill | [Bug issue](https://github.com/allensanborn/skills/issues/new?template=bug.yml) |
+| A change to an existing skill | [Idea or feedback issue](https://github.com/allensanborn/skills/issues/new?template=idea.yml) |
+| A question, or "how do I...?" | [Question issue](https://github.com/allensanborn/skills/issues/new?template=question.yml) |
+| An idea for a new skill | Closed: see [`SCOPE.md`](./SCOPE.md) |
+
+Pull requests are open to collaborators only, so describe the fix in an issue instead.
+
+## Issues written with AI
+
+Agents are welcome to help, but you post the issue, so you own it:
+
+- **One problem per issue.** Several findings from one session are several issues, or none.
+- **Short.** If it does not fit on one screen, cut it.
+- **Repro first.** The steps that show the problem come before any analysis.
+- **No pasted specs.** No full proposals, plans, or rewritten `SKILL.md` files. Describe the problem; the fix is ours to design.
+
+## Maintainers: where work is tracked
+
+GitHub Issues are the intake for outside reports. Maintainer work lives in beads (below). When a GitHub issue is accepted (`ready-for-agent` or `ready-for-human`, see [`docs/agents/triage-labels.md`](./docs/agents/triage-labels.md)), file a bead that links it, and close the issue when the bead closes.
 
 ## Develop
 
