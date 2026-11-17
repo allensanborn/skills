@@ -66,8 +66,15 @@ workspace extends ../system-catalog/workspace.dsl {
         svc -> obsPlatform "Exports telemetry via" "OTLP" "Telemetry"
     }
     views {
-        systemContext <catalogId> "Context" { include *; autolayout lr }
-        container     <catalogId> "Containers" { include *; exclude obsPlatform; autolayout lr }
+        systemContext <catalogId> "Context" {
+            include *
+            autolayout lr
+        }
+        container <catalogId> "Containers" {
+            include *
+            exclude obsPlatform
+            autolayout lr
+        }
         # base styles live here; never `theme default` (dead host)
         !include ../_shared/styles.dsl
     }
@@ -129,8 +136,8 @@ license. So the whole pipeline above runs offline.
 *"All Structurizr commands are free to use from these binaries except for `server`, which requires
 a license."* That means:
 
-- `server`: stands up your own Structurizr UI/API. **Licensed** from the prebuilt image (the
-  container has been observed to exit with **"No license found"**). It is open core, so building
+- `server`: stands up your own Structurizr UI/API. **Licensed** from the prebuilt image: it boots, logs
+  **"No license found"**, and exits 1 (verified on v2026.10.26). It is open core, so building
   from source is free; the **closed** extensions are authentication, cloud data storage,
   Elasticsearch integration, Redis distributed sessions, and the workspace admin API. Licensing
   is per installation, priced by unique users per year.
