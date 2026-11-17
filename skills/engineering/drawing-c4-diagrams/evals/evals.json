@@ -37,7 +37,7 @@
       "id": 4,
       "prompt": "Here's some Structurizr DSL I wrote but it won't render. Fix it. [DSL with a syntax error]",
       "expected_behavior": [
-        "Validates with whatever tier is available — MCP tools if connected, otherwise headless `structurizr/structurizr validate -workspace workspace.dsl` (a parser exception / non-zero exit is the validation signal; a failed `export` is the same signal), or careful reading at Tier 0",
+        "Validates with whatever tier is available: MCP tools if connected, otherwise headless `structurizr/structurizr validate -workspace workspace.dsl` (a parser exception / non-zero exit is the validation signal; a failed `export` is the same signal), or careful reading at Tier 0",
         "Runs a validate -> fix -> re-validate loop until the DSL parses",
         "Explains what was wrong in C4 terms, not just syntax"
       ],
@@ -48,7 +48,7 @@
       "prompt": "Skip the grill, just give me container-diagram DSL for a two-service system with a queue between them.",
       "expected_behavior": [
         "Still runs the hard-to-skip pre-generation scoping essentials",
-        "Honors 'skip the grill' for the POST-generation CONTENT grill only — still renders and eyeballs the result",
+        "Honors 'skip the grill' for the POST-generation CONTENT grill only, and still renders and eyeballs the result",
         "Produces valid DSL with the queue modelled as a container with a technology"
       ],
       "files": []
@@ -57,7 +57,7 @@
       "id": 6,
       "prompt": "I have Docker but haven't set up any Structurizr MCP server. Generate the C4 diagrams for my app and give me PNGs I can drop in the repo.",
       "expected_behavior": [
-        "Does NOT assume MCP; uses the headless path — `structurizr/structurizr export` (DSL -> PlantUML) then rasterise PlantUML -> PNG/SVG",
+        "Does NOT assume MCP; uses the headless path: `structurizr/structurizr export` (DSL -> PlantUML) then rasterise PlantUML -> PNG/SVG",
         "Runs `validate` (or treats a failed export) as the validation signal; verifies each view is non-empty via the exported workspace.json counts",
         "Prefers PNG/SVG over Mermaid for repo-committed images (Structurizr Mermaid uses HTML labels that render poorly on GitHub)"
       ],
@@ -95,7 +95,7 @@
     },
     {
       "id": 10,
-      "prompt": "Here's my finished workspace.dsl — is the container diagram good to ship?",
+      "prompt": "Here's my finished workspace.dsl. Is the container diagram good to ship?",
       "expected_behavior": [
         "Actually renders the view and looks at it (render-and-look is not skippable), not just DSL validation",
         "Checks for visual/scoping defects: empty view (verifies non-zero element/relationship counts), whole-landscape inclusions, hairballs, overlapping boxes, orphans, legibility",
@@ -109,14 +109,14 @@
       "expected_behavior": [
         "Points at the free open-source playground at `playground.structurizr.com` (not the old structurizr.com/dsl URL, and not the cloud service)",
         "Says plainly that the Structurizr cloud service is end-of-life with no replacement, so signing up is not the move",
-        "Offers the self-hosted alternatives for later — `structurizr/structurizr playground` or `local` for free local use, `server` (licensed) for publishing to a team",
-        "Does NOT claim push/pull require a commercial license — only `server` does"
+        "Offers the self-hosted alternatives for later: `structurizr/structurizr playground` or `local` for free local use, `server` (licensed) for publishing to a team",
+        "Does NOT claim push/pull require a commercial license. Only `server` does"
       ],
       "files": []
     },
     {
       "id": 12,
-      "prompt": "Set up the Structurizr tooling for me — I've got Docker.",
+      "prompt": "Set up the Structurizr tooling for me. I've got Docker.",
       "expected_behavior": [
         "Pulls the consolidated `structurizr/structurizr` image for Tier 1 (the `<release>-playwright` tag, so PNG/SVG export works), not the frozen `structurizr/lite` or `structurizr/cli` images (whose `:latest` is now a stub that exits immediately)",
         "Uses the vNext subcommand names (`local`, `validate`, `export`, `inspect`, `generate`, `playground`) rather than the retired Lite/CLI product names",

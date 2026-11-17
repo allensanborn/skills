@@ -29,13 +29,13 @@ One or two plain-language paragraphs. Lead with the skill's one-sentence job, th
 ## When to reach for it
 
 - **Invocation mode.** A user-invoked skill: "You invoke this by typing `/<name>`, and the agent won't reach for it on its own." A model-invoked skill: "Type `/<name>`, or the agent reaches for it automatically when a task fits."
-- **Trigger boundary.** "Reach for this when …". Where the skill is confusable with a sibling, add the other half: "for <X> instead, use <sibling>."
+- **Trigger boundary.** "Reach for this when …". Where the skill is confusable with a sibling, add the other half: "for `<X>` instead, use `<sibling>`."
 
 ## Prerequisites
 
 Optional: include only when the skill needs something in place: a workspace it writes into, prior setup, or tooling (Docker, a CLI). Omit the heading otherwise.
 
-## <free-form middle>
+## `<free-form middle>`
 
 One to three short sections, in the skill's *own vocabulary*, that make it click. The single non-negotiable: **surface the skill's leading word / defining idea**.
 

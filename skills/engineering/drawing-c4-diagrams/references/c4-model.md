@@ -1,20 +1,20 @@
-# The C4 Model — Reference
+# The C4 Model: Reference
 
 A working reference for generating software-architecture diagrams with the C4 model.
 Optimized for an LLM producing correct, unambiguous diagrams rather than prose.
 
 The C4 model was created by Simon Brown (c4model.com). This reference is an original
-summary — see the book *The C4 Model* and c4model.com for depth.
+summary. See the book *The C4 Model* and c4model.com for depth.
 
 ## Contents
 
 - [Core idea](#core-idea)
 - [The static abstractions](#the-static-abstractions)
 - [The four levels](#the-four-levels)
-  - [Level 1 — System Context](#level-1--system-context)
-  - [Level 2 — Container](#level-2--container)
-  - [Level 3 — Component](#level-3--component)
-  - [Level 4 — Code](#level-4--code)
+  - [Level 1: System Context](#level-1-system-context)
+  - [Level 2: Container](#level-2-container)
+  - [Level 3: Component](#level-3-component)
+  - [Level 4: Code](#level-4-code)
 - [Supplementary diagrams](#supplementary-diagrams)
   - [Dynamic diagram](#dynamic-diagram)
   - [Deployment diagram](#deployment-diagram)
@@ -33,42 +33,42 @@ before worrying about visuals.
 **The map/zoom metaphor.** C4 is a set of hierarchical diagrams like Google Maps: zoom out
 for the whole country, zoom in for one street. Each level tells a different story to a
 different audience, at a consistent level of abstraction. Because the vocabulary is fixed,
-C4 is **notation-independent** — use any shapes/colours/lines you like, as long as a legend
+C4 is **notation-independent**: use any shapes/colours/lines you like, as long as a legend
 explains them. (The familiar blue-and-gray boxes are *not* an official notation.)
 
-**Diagrams must stand alone.** A good diagram is readable with no verbal narration — any
+**Diagrams must stand alone.** A good diagram is readable with no verbal narration; any
 spoken explanation should *complement*, not *decode*, it. The test: hand it to someone with
 no context and see if they interpret it correctly.
 
 ## The static abstractions
 
 One sentence: *A software system is made up of one or more containers, each of which
-contains one or more components, which are implemented by one or more code elements — and
+contains one or more components, which are implemented by one or more code elements, and
 people use the software systems we build.*
 
-- **Person** — a human user, role, persona, or actor (human or otherwise) that uses the
+- **Person**: a human user, role, persona, or actor (human or otherwise) that uses the
   system. Sits at the top of the model.
-- **Software System** — the highest level of abstraction: something that delivers value to
+- **Software System**: the highest level of abstraction, something that delivers value to
   its users. Includes the system you're describing *and* the external systems it depends
   on. Heuristic: typically what a single team builds, owns, and can see inside of (often one
   repo, one team boundary). *Not* a product domain, DDD bounded context, business
   capability, or squad.
-- **Container** — an application or a data store; something that must be **running** for the
+- **Container**: an application or a data store; something that must be **running** for the
   system to work. **This is NOT a Docker/Kubernetes container** (call it a "C4 container" if
-  the clash bothers you). It is a **separately deployable/runnable unit** — a runtime
+  the clash bothers you). It is a **separately deployable/runnable unit**: a runtime
   boundary with a degree of isolation, independent of *how* it's deployed. Communication
   between containers is usually an out-of-process/remote call (process or network boundary).
   - *Applications:* server-side web apps, SPAs, desktop apps, mobile apps, console apps,
     serverless functions, shell scripts.
   - *Data stores:* databases/schemas, document/graph/key-value stores, blob/object stores,
     CDNs, file systems.
-- **Component** — a grouping of related functionality behind a well-defined interface,
+- **Component**: a grouping of related functionality behind a well-defined interface,
   running **inside** a container. Essentially a collection of code (classes, a module, a
-  package/directory). **Components are NOT separately deployable** — the container is the
+  package/directory). **Components are NOT separately deployable**: the container is the
   deployable unit; components in a container run in the same process and talk via in-process
   calls. ("Containers contain components.")
-- **Code element** — the internals of a component in the language's own building blocks:
-  classes, interfaces, enums, functions, objects.
+- **Code element**: the internals of a component in the language's own building blocks
+  (classes, interfaces, enums, functions, objects).
 
 ## The four levels
 
@@ -82,7 +82,7 @@ people use the software systems we build.*
 Keep element placement **consistent across levels** (e.g. if people are on top at Level 1,
 keep them on top at Level 2).
 
-### Level 1 — System Context
+### Level 1: System Context
 
 - **Shows:** the one system in scope as a single box, the people who use it, and the
   external systems it interacts with. Deliberately low-detail. Answers: what is this system,
@@ -96,7 +96,7 @@ keep them on top at Level 2).
   tagging box types (e.g. `[Person]`, `[Software System]`); bloating the actor list with
   every admin/operator who merely reads logs.
 
-### Level 2 — Container
+### Level 2: Container
 
 - **Shows:** how the system decomposes into applications and data stores, their
   responsibilities, the **primary technology choices**, and how they communicate. Helps an
@@ -109,7 +109,7 @@ keep them on top at Level 2).
   **and** the technology/protocol (JSON/HTTP, gRPC, etc.) since these are usually
   inter-process calls. Sync vs. async can be shown via line style.
 - **Keep off it:** deployment/infrastructure (Docker, Kubernetes, load balancers,
-  firewalls, API gateways, cloud regions) — that goes on a deployment diagram.
+  firewalls, API gateways, cloud regions); that goes on a deployment diagram.
 - **Container vs. external system call:** the test is *ownership/responsibility*, not
   hosting. A cloud-hosted object-store bucket you control the contents and structure of is a
   *container*; a stable third-party service you merely call (e.g. a transactional email
@@ -119,19 +119,19 @@ keep them on top at Level 2).
   relationships; dropping the Level-1 external people/systems; mis-modeling an integral data
   store as external (or vice versa).
 
-### Level 3 — Component
+### Level 3: Component
 
 - **Shows:** how one container decomposes into components, their responsibilities, how they
   collaborate, and their frameworks/libraries. The components should mirror the codebase's
   **actual** structure and architectural style (layered, ports-and-adapters, etc.).
-- **Scope/boundary:** a **single container** — draw one component diagram *per* container,
+- **Scope/boundary:** a **single container**; draw one component diagram *per* container,
   never a combined one. Draw a container boundary box; optionally show the system boundary
   too.
 - **Elements:** Components (name + technology + responsibilities), plus People, external
   systems, and other containers repeated for continuity. Relationships have a description
-  and, *only if applicable*, a protocol — most component-to-component calls are in-process
+  and, *only if applicable*, a protocol; most component-to-component calls are in-process
   and need **no** protocol label.
-- **Biggest risk — drift.** Component diagrams rot fastest because they map directly to code
+- **Biggest risk: drift.** Component diagrams rot fastest because they map directly to code
   that changes constantly. Prefer generating them from code / keeping them close to it.
 - **Common mistakes:** one diagram for multiple containers; letting it drift from the code;
   over-annotating in-process calls with protocols; drawing an idealized structure instead of
@@ -139,9 +139,9 @@ keep them on top at Level 2).
 - **Note:** for most systems the Container diagram is the practical stopping point; add
   component diagrams selectively.
 
-### Level 4 — Code
+### Level 4: Code
 
-- **Shows:** the internals of a single component as code-level building blocks — typically a
+- **Shows:** the internals of a single component as code-level building blocks, typically a
   UML class diagram for OO languages. Which elements are public/exported vs. internal, and
   how big/complex the component is.
 - **Scope/boundary:** a **single component** (keeping scope this tight is the whole point;
@@ -160,12 +160,12 @@ can't. Each reuses the same abstractions, shapes, and notation.
 
 ### Dynamic diagram
 
-- **Purpose:** show *behaviour* — how a **subset** of elements collaborate at runtime to
+- **Purpose:** show *behaviour*: how a **subset** of elements collaborate at runtime to
   deliver one feature/use case/story.
 - **Form:** a UML sequence diagram (instances left-to-right, time top-to-bottom) or a
   numbered collaboration/communication diagram (free-form boxes with numbered arrows for
   ordering). Both convey the same thing; the numbered style is easy on a whiteboard.
-- **Scope:** varies with the story — from software systems collaborating (business
+- **Scope:** varies with the story, from software systems collaborating (business
   capability) down to code elements in a component. Constrain it as tightly as possible.
 - **Audience:** mirrors the static level you draw it at.
 - **Use sparingly**, only when the static views can't easily show how a feature works.
@@ -176,9 +176,9 @@ can't. Each reuses the same abstractions, shapes, and notation.
   **one deployment environment** (dev, test, staging, live). This is where all the
   deployment detail excluded from the container diagram belongs.
 - **Element types:** container instances (the primary content), software-system instances,
-  **deployment nodes** (infrastructure software is *deployed into* — physical/virtual/
+  **deployment nodes** (infrastructure software is *deployed into*: physical/virtual/
   containerized infra, server environments; can be **nested**), and **infrastructure nodes**
-  (services *used* rather than deployed into — DNS, routers, load balancers, firewalls).
+  (services *used* rather than deployed into, such as DNS, routers, load balancers, firewalls).
 - **Why it exists:** a single system is usually deployed to several environments at once
   (e.g. plain JVM on a laptop in dev, a Docker image on cloud in prod). Give each
   environment its own diagram instead of overloading one container diagram.
@@ -188,11 +188,11 @@ can't. Each reuses the same abstractions, shapes, and notation.
 ### System Landscape diagram
 
 - **Purpose:** zoom *out past* Level 1 to map **many** software systems and people across a
-  group/department/organization — a system context diagram with **no single focus**.
+  group/department/organization. It is a system context diagram with **no single focus**.
 - **Elements:** just People and Software Systems (same as Level 1).
 - **Answers:** how do systems fit together; impact of changing/removing a system; impact of
   reorganizing.
-- **Scope:** your choice — an org (only for small ones), a department, a product domain, a
+- **Scope:** your choice: an org (only for small ones), a department, a product domain, a
   business capability, a bounded context. **Audience:** same as Level 1.
 - **Use** when reasoning about a *collection* of systems (impact analysis, portfolio
   conversations) rather than one.
@@ -206,7 +206,7 @@ Notation is secondary, but good notation makes diagrams self-describing.
   (technical abbreviations like HTTP/JSON/SQL are fine); expand code names or put them in the
   key/glossary.
 - **Always include a legend/key.** Explain every variation in shape, colour, icon, and line
-  style — even when it "seems obvious," because different readers assume different things.
+  style, even when it "seems obvious," because different readers assume different things.
   Beware ambiguous terms like "internal/external" (relative to *what* boundary?).
 - **Add more words.** Don't ship name-only rectangles. Per element, include: **Name**;
   **Type** in square brackets (e.g. `[Container]`); **Technology** for containers/components
@@ -224,7 +224,7 @@ Notation is secondary, but good notation makes diagrams self-describing.
 - **Layout / size / colour / shape / icons.** No mandated orientation, but keep placement
   consistent across levels. Start with same-sized plain rectangles focused on content; add
   shape (cylinders for data stores, folders for file systems, pipes for queues, stick
-  figures for people), colour (encode new-vs-existing, build-vs-buy, ownership — survive
+  figures for people), colour (encode new-vs-existing, build-vs-buy, ownership; make it survive
   colour-blindness and B&W printing), and icons later. Every visual variation goes in the
   key. Draw elements roughly the same size unless size deliberately signals
   significance/complexity.

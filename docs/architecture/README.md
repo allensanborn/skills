@@ -40,6 +40,7 @@ terms page refused my fetch (403), so I haven't confirmed the quotes myself or t
 governs docs.oracle.com assets.
 
 Implications:
+
 - **Skill repo:** fine as is. Never commit vendor icon PNGs here or into a user's repo; reference a
   theme.
 - **Users' diagrams:** internal or customer-facing diagrams of the vendor's own services are what

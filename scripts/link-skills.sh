@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Dev-only: symlink every skill in this repo into the local skill directories, so edits
 # are live in the next session and `git pull` is the only update step.
-#   ~/.claude/skills  — Claude Code
-#   ~/.agents/skills  — Codex and other Agent Skills-compatible harnesses
+#   ~/.claude/skills  (Claude Code)
+#   ~/.agents/skills  (Codex and other Agent Skills-compatible harnesses)
 # Don't also install the allensanborn-skills plugin on the same machine: you'd get every
 # skill twice.
 set -euo pipefail

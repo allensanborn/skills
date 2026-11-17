@@ -7,7 +7,7 @@ Agent skills for Claude Code and other [Agent Skills](https://platform.claude.co
 The plugin updates itself on each release. [skills.sh](https://skills.sh) copies editable files into your project, and you update them by hand. Pick one, because installing both gives you every skill twice.
 
 <details>
-<summary><strong>Claude Code</strong></summary>
+<summary>Claude Code</summary>
 
 ```bash
 claude plugin marketplace add allensanborn/skills
@@ -19,7 +19,7 @@ Updates when a new version is released.
 </details>
 
 <details>
-<summary><strong>Every other agent, or editable files</strong> (skills.sh)</summary>
+<summary>Every other agent, or editable files (skills.sh)</summary>
 
 ```bash
 npx skills@latest add allensanborn/skills
@@ -29,7 +29,7 @@ Manual updates: run `npx skills@latest update`, and re-run `add` to pick up new 
 
 </details>
 
-## Skills
+## Available skills
 
 ### Engineering
 
