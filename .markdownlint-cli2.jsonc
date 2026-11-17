@@ -1,0 +1,12 @@
+{
+  "config": {
+    // Existing prose is hard-wrapped at ~92 columns, and tables/URLs run long.
+    "MD013": false,
+    // docs/ pages (titled by filename, as upstream) and eval prompts/graders have no H1.
+    "MD041": false,
+    // Table pipe padding is cosmetic.
+    "MD060": false,
+    "MD033": { "allowed_elements": ["details", "summary", "canonical-block", "page-template"] }
+  },
+  "ignores": ["node_modules/**", ".beads/**", ".dagger/**", "CHANGELOG.md", ".changeset/README.md"]
+}

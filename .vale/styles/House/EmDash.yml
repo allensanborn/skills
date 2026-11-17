@@ -1,0 +1,8 @@
+# CLAUDE.md: no em-dashes. Rewrite the sentence (comma, colon, period,
+# parentheses, conjunction); never swap the character blindly.
+extends: existence
+message: "Em-dash: rewrite the sentence with a comma, colon, period, parentheses, or a conjunction."
+level: error
+nonword: true
+tokens:
+  - '—'

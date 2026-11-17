@@ -37,11 +37,13 @@ minutes) — see [`.dagger/`](.dagger/). GitHub Actions are added only once a sk
 proven ship-ready.
 
 ```bash
-# via Dagger: lint, and the drawing-c4-diagrams render test (Docker + network)
+# via Dagger: lint, prose lint, and the drawing-c4-diagrams render test (Docker + network)
 dagger call lint --source=.
+dagger call markdownlint --source=.   # .markdownlint-cli2.jsonc
+dagger call vale --source=.           # .vale.ini, House style (no em-dashes)
 dagger call render-test --source=.
 
-# local lint (skill-lint + reference link check)
+# local: AGENTS/CLAUDE parity, plugin manifest + validate, version sync, skill-lint, links
 bash ci/check.sh
 ```
 

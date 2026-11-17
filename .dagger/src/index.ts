@@ -3,6 +3,8 @@
  *
  *   dagger call lint --source=.
  *   dagger call render-test --source=.
+ *   dagger call markdownlint --source=.
+ *   dagger call vale --source=.
  */
 import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 
@@ -12,6 +14,8 @@ const PLANTUML = "plantuml/plantuml:1.2026.10"
 const MERMAID = "minlag/mermaid-cli:12.0.0"
 const THEME_URL =
   "https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json"
+const MARKDOWNLINT = "davidanson/markdownlint-cli2:v0.24.0"
+const VALE = "jdkato/vale:v3.25.0"
 const RENDER = "skills/engineering/drawing-c4-diagrams/evals/render"
 
 @object()
@@ -27,6 +31,34 @@ export class Skills {
       .withDirectory("/src", source, { exclude: ["**/node_modules", ".dagger/sdk"] })
       .withWorkdir("/src")
       .withExec(["bash", "ci/check.sh"])
+      .stdout()
+  }
+
+  /**
+   * markdownlint-cli2 over every Markdown file (config: .markdownlint-cli2.jsonc)
+   */
+  @func()
+  async markdownlint(source: Directory): Promise<string> {
+    return dag
+      .container()
+      .from(MARKDOWNLINT)
+      .withDirectory("/workdir", source, { exclude: ["**/node_modules", ".dagger/sdk"] })
+      .withWorkdir("/workdir")
+      .withExec(["**/*.md"], { useEntrypoint: true })
+      .stdout()
+  }
+
+  /**
+   * Vale prose lint with the House style (config: .vale.ini, rules in .vale/styles/House/)
+   */
+  @func()
+  async vale(source: Directory): Promise<string> {
+    return dag
+      .container()
+      .from(VALE)
+      .withDirectory("/src", source, { exclude: ["**/node_modules", ".dagger/sdk", ".beads"] })
+      .withWorkdir("/src")
+      .withExec(["--glob=!{node_modules,.beads,.dagger}/**", "."], { useEntrypoint: true })
       .stdout()
   }
 
