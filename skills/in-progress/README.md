@@ -1,8 +1,11 @@
 # In progress
 
-Drafts. Not shipped in the plugin (`.claude-plugin/plugin.json`) and not listed in the root
-README. `scripts/link-skills.sh` still links them locally, so you can use them while you work
-on them.
+Beta. Not shipped in the plugin (`.claude-plugin/plugin.json`), not listed in the root
+README, and no docs page. `scripts/link-skills.sh` still links them locally, so you can use
+them while you work on them.
 
-To promote a skill: move it into a shipped category (`engineering/`, `productivity/`), add its
-path to `plugin.json`'s `skills` array, add it to the root README, and bump `version`.
+To promote a skill: move it into a promoted bucket (`engineering/`, `productivity/`), add its
+path to `plugin.json`'s `skills` array, list it in the root and bucket READMEs, write its
+`docs/<bucket>/<name>.md` page, and add a changeset (`npx changeset`).
+
+This bucket is currently empty.
