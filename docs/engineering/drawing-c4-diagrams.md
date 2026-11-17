@@ -4,6 +4,8 @@
 
 It will not draw until you have told it who the diagram is for and what system it is about. The point is not pretty boxes: it **grills** you on audience, scope, abstraction level, and boundaries, so the diagram means the same thing to everyone who reads it.
 
+To see a whole run before installing, read the [sample output](https://github.com/allensanborn/skills/tree/main/docs/examples/drawing-c4-diagrams): a grilled run from a one-line prompt, and an AWS deployment view with icons, each with its full transcript, DSL, and rendered diagrams.
+
 ## When to reach for it
 
 Type `/drawing-c4-diagrams`, or the agent reaches for it automatically when you ask to diagram, visualize, or document software architecture, mention C4 or Structurizr, or paste a diagram image.
