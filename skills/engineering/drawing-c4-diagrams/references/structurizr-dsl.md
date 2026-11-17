@@ -96,7 +96,12 @@ rejects it with `Too many tokens, expected: <identifier> -> <identifier> [descri
     }
 ```
 
-The same one-line-brace trap applies to **elements**: `softwareSystem "X" { tags "Platform" }` on a
+The same one-line-brace trap applies to **view bodies**, because the DSL has no statement
+separator: `systemContext s "Context" { include *; autolayout lr }` fails with `Too many tokens,
+expected: systemContext <software system identifier> [key] [description] {` (exit 1; the
+multi-line form exits 0, verified on v2026.10.26). Put each statement on its own line.
+
+It applies to **elements** too: `softwareSystem "X" { tags "Platform" }` on a
 single line fails the same way. Tags is the last positional argument: `softwareSystem "Name"
 "Description" "Tag"` (person/softwareSystem) or `container "Name" "Description" "Technology" "Tag"`.
 Or put a `{ tags "..." }` block on its **own lines**.
