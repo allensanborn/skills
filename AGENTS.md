@@ -22,6 +22,8 @@ Every user-facing change to a skill gets a changeset (`npx changeset`). The Rele
 
 Decisions that shape a skill or the repo are recorded as ADRs in [.agents/adr/](./.agents/adr/). Domain terms live in [GLOSSARY.md](./GLOSSARY.md).
 
+Research notes are throwaway: write them to `.scratch/` (gitignored) and record conclusions in the bead's notes. Before the bead closes, fold anything durable into a skill's `references/`, a docs page, or an ADR; never commit a standalone research file, because a dated note goes stale silently.
+
 Every skill keeps its evals in `evals/` (an `evals.json` plus one `<skill>-<n>/` case folder per eval). Add or update a case when you change behaviour the evals cover.
 
 To (re)link every skill outside `deprecated/` and `misc/` into the local harness skill directories (`~/.claude/skills`, `~/.agents/skills`), run `scripts/link-skills.sh`. Each entry is a symlink into this repo, so a `git pull` keeps installed skills current; re-run the script after adding, removing, or renaming a skill.

@@ -78,6 +78,33 @@ cross every service-to-store edge when a dozen of them share one band, and layou
 rows. Keep a data view to about 5 elements. Name the keys so the order reads (`02-Containers`,
 `02b-Data-Booking`, `02c-Data-ReadPath`) and say in each description where the rest is.
 
+**Crowded deployment view: split by concern.** A real cloud deployment (DNS, CDN, WAF, load
+balancer, several services, several managed stores, a queue, identity, object storage) is 25-30
+elements once the nesting is counted, and one view of it renders around 8000 px wide: unreadable
+anywhere it's shown (see *Legibility at size* in the review checklist). Draw several deployment
+views of the **same environment**, each including only what its story needs; Structurizr pulls in
+the enclosing deployment nodes automatically:
+
+```text
+deployment blog live "Deployment-Edge" "Live: how a request reaches the apps." {
+    include dns cdn waf alb webInstance apiInstance mediaInstance
+    autolayout tb
+}
+deployment blog live "Deployment-Data" "Live: the apps and their data stores." {
+    include apiInstance workerInstance dbInstance cacheInstance searchInstance
+    autolayout lr
+}
+deployment blog live "Deployment-Async" "Live: events, identity, media and email." {
+    include apiInstance workerInstance queueInstance identityInstance mediaInstance emailNode
+    autolayout tb
+}
+```
+
+Every `containerInstance` a view names needs an identifier (`dbInstance = containerInstance db`);
+an anonymous instance can't be included. Verified on v2026.10.26: an 8393 px, 28-element view
+became three views of 2440-3447 px that read at README width. To cut clutter further, `element
+"Element" { description false }` in the styles hides descriptions (it does not narrow the boxes).
+
 **Cross-cutting dependency (telemetry, feature flags, auth sidecar).** When *every* container
 talks to one shared thing, drawing N identical arrows on the main container view is pure
 noise. Model the real edges once (tag them, e.g. `"Telemetry"`), keep them **off** the main
@@ -196,8 +223,9 @@ Prefer these built-ins over hand-maintaining duplicate diagrams: one model, many
   deployment view; the container diagram is logical.
 - **External systems omitted**: if it's not owned but is depended on, show it (tagged
   external). "No external systems" is almost always wrong.
-- **Too many elements**: split into multiple views (request path vs per-store-group data views),
-  use groups, or a filtered view.
+- **Too many elements**: split into multiple views (request path vs per-store-group data views;
+  edge / data / async for deployment), use groups, or a filtered view. Check the width budget
+  in the review checklist rather than trusting the full-size render.
 - **Unexplained acronyms / generic names** ("business logic", "backend"): name the real
   responsibility.
 - **No legend / inconsistent notation**: colours and shapes must be consistent and

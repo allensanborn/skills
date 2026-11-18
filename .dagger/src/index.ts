@@ -5,6 +5,8 @@
  *   dagger call render-test --source=.
  *   dagger call markdownlint --source=.
  *   dagger call vale --source=.
+ *   dagger call gitleaks --source=.
+ *   dagger call zizmor --source=.
  */
 import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 
@@ -16,6 +18,8 @@ const THEME_URL =
   "https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json"
 const MARKDOWNLINT = "davidanson/markdownlint-cli2:v0.24.0"
 const VALE = "jdkato/vale:v3.25.0"
+const GITLEAKS = "zricethezav/gitleaks:v8.30.1"
+const ZIZMOR = "1.32.0"
 const RENDER = "skills/engineering/drawing-c4-diagrams/evals/render"
 
 @object()
@@ -59,6 +63,34 @@ export class Skills {
       .withDirectory("/src", source, { exclude: ["**/node_modules", ".dagger/sdk", ".beads"] })
       .withWorkdir("/src")
       .withExec(["--glob=!{node_modules,.beads,.dagger}/**", "."], { useEntrypoint: true })
+      .stdout()
+  }
+
+  /**
+   * gitleaks over the working tree (history is covered by GitHub push protection)
+   */
+  @func()
+  async gitleaks(source: Directory): Promise<string> {
+    return dag
+      .container()
+      .from(GITLEAKS)
+      .withDirectory("/src", source, { exclude: ["**/node_modules", ".dagger/sdk", ".git"] })
+      .withExec(["dir", "/src", "--no-banner", "--redact"], { useEntrypoint: true })
+      .stdout()
+  }
+
+  /**
+   * zizmor security lint of .github/workflows (offline: no GitHub API calls)
+   */
+  @func()
+  async zizmor(source: Directory): Promise<string> {
+    return dag
+      .container()
+      .from("python:3.13-slim")
+      .withExec(["pip", "install", "--no-cache-dir", `zizmor==${ZIZMOR}`])
+      .withDirectory("/src/.github", source.directory(".github"))
+      .withWorkdir("/src")
+      .withExec(["zizmor", "--offline", "--min-severity", "low", "."])
       .stdout()
   }
 

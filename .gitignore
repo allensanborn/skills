@@ -1,4 +1,5 @@
 node_modules/
+.scratch/
 .DS_Store
 *.log
 # local, per-project skill config (documented via .c4-diagrams.example.json)

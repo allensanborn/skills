@@ -96,7 +96,12 @@ rejects it with `Too many tokens, expected: <identifier> -> <identifier> [descri
     }
 ```
 
-The same one-line-brace trap applies to **elements**: `softwareSystem "X" { tags "Platform" }` on a
+The same one-line-brace trap applies to **view bodies**, because the DSL has no statement
+separator: `systemContext s "Context" { include *; autolayout lr }` fails with `Too many tokens,
+expected: systemContext <software system identifier> [key] [description] {` (exit 1; the
+multi-line form exits 0, verified on v2026.10.26). Put each statement on its own line.
+
+It applies to **elements** too: `softwareSystem "X" { tags "Platform" }` on a
 single line fails the same way. Tags is the last positional argument: `softwareSystem "Name"
 "Description" "Tag"` (person/softwareSystem) or `container "Name" "Description" "Technology" "Tag"`.
 Or put a `{ tags "..." }` block on its **own lines**.
@@ -303,7 +308,10 @@ Installed names: `amazon-web-services-2020.04|2022.04|2023.01|2025.07`,
 `microsoft-azure-2019.09|2020.07|2021.01|2023.01|2024.07|2025.11`,
 `google-cloud-platform-v1.5|2025.09`, `oracle-cloud-infrastructure-2020.04|2021.04|2023.04`,
 `kubernetes`. Cookbook URLs like `.../amazon-web-services-2023.01.31/theme.json` are dead; the
-installed names drop the day.
+installed names drop the day. Sources (checked 2026-11-13): the image's `structurizr-themes/`
+directory and `changelog-*.md` in [structurizr/structurizr](https://github.com/structurizr/structurizr),
+and the [themes](https://docs.structurizr.com/server/diagrams/themes) and
+[AWS cookbook](https://docs.structurizr.com/dsl/cookbook/amazon-web-services) docs.
 
 - **The CLI must be told where they are**: `docker run -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes …`.
   Without it, `validate`/`export` fail: *"Theme amazon-web-services-2025.07 does not exist at /work/…"*.

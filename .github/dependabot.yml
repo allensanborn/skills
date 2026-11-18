@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Keeps the SHA-pinned actions current; major versions arrive as their own PRs.
+  # cooldown: skip releases younger than a week, so a hijacked release has time to be caught.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: npm
+    directory: /.dagger
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7

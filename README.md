@@ -1,5 +1,8 @@
 # Skills
 
+[![CI](https://github.com/allensanborn/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/allensanborn/skills/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/allensanborn/skills/badge)](https://scorecard.dev/viewer/?uri=github.com/allensanborn/skills)
+
 Agent skills for Claude Code and other [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) harnesses, built on the conventions of [mattpocock/skills](https://github.com/mattpocock/skills): small, composable, and each one makes you think rather than doing the thinking for you.
 
 ## Installation
@@ -35,7 +38,7 @@ Manual updates: run `npx skills@latest update`, and re-run `add` to pick up new 
 
 #### Model-invoked
 
-- **[drawing-c4-diagrams](./skills/engineering/drawing-c4-diagrams/SKILL.md)**: Create and refine C4 architecture diagrams as Structurizr DSL, validated and rendered locally, while grilling you so you defend the design instead of accepting generated boxes. [Docs](./docs/engineering/drawing-c4-diagrams.md).
+- **[drawing-c4-diagrams](./skills/engineering/drawing-c4-diagrams/SKILL.md)**: Create and refine C4 architecture diagrams as Structurizr DSL, validated and rendered locally, while grilling you so you defend the design instead of accepting generated boxes. [Docs](./docs/engineering/drawing-c4-diagrams.md) · [Sample output](./docs/examples/drawing-c4-diagrams/).
 
 ## Contributing
 

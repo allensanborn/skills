@@ -26,3 +26,7 @@ Authored from the O'Reilly book *The C4 Model* (Simon Brown) and the Structurizr
 ## Update, 2026-11-17
 
 The "GitHub Actions only when ship-ready" line is narrowed: issue-triage and changeset-release workflows now run on GitHub Actions (adopted from mattpocock/skills). Quality gates (lint, Vale, markdownlint, render-test) still run in Dagger only; bead `skills-8wp` tracks wiring them into Actions.
+
+## Update, 2026-11-18
+
+Quality gates now run in GitHub Actions too (`.github/workflows/ci.yml`), calling the same Dagger functions, once the repo was public and needed public, required checks. Dagger stays the single definition of each check; Actions only invokes it.
