@@ -42,7 +42,7 @@ because Docker is there.
 > local run instead. Full subcommand set: `playground`, `local`, `server`, `export`, `push`,
 > `pull`, `branches`, `create`, `delete`, `lock`, `unlock`, `merge`, `validate`, `inspect`,
 > `list`, `generate`, `regenerate-apikey`. To confirm against the installed build rather than
-> this list, run **`docker run -it --rm structurizr/structurizr help`**.
+> this list, run **`docker run -it --rm structurizr/structurizr:2026.10.26-playwright help`**.
 >
 > Everything is now one Spring Boot app with embedded Tomcat (Java 21), so the `.war` is
 > interchangeable with the image: `java -jar structurizr.war <subcommand>` takes the same
@@ -66,9 +66,9 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
 
 1. Probe: is `docker` on PATH? Is a browser available? Is an MCP server reachable?
 2. Ask the user which tier they want. **Prefer Docker** when offering to install tooling:
-   - Tier 1 → `docker pull structurizr/structurizr:<release>-playwright` (e.g. `2026.10.26-playwright`;
+   - Tier 1 → `docker pull structurizr/structurizr:2026.10.26-playwright` (the tested release, and
      the only variant that can export PNG/SVG; see below)
-   - Tier 2 → also `docker pull structurizr/mcp` (MCP is still a **separate image**)
+   - Tier 2 → also `docker pull structurizr/mcp:2026.04.20` (MCP is still a **separate image**)
 3. Ask where diagrams should live (default `docs/architecture/`).
 4. Ask whether the post-generation review grill is on (default: on).
 5. Confirm MCP privacy: local Docker (default) vs public `mcp.structurizr.com` (opt-in).
@@ -96,8 +96,8 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
 Run the server (local Docker, privacy-preserving default):
 
 ```bash
-docker pull structurizr/mcp
-docker run -it --rm -p 3000:3000 -e PORT=3000 structurizr/mcp -dsl -mermaid -plantuml
+docker pull structurizr/mcp:2026.04.20
+docker run -it --rm -p 3000:3000 -e PORT=3000 structurizr/mcp:2026.04.20 -dsl -mermaid -plantuml
 ```
 
 Client config (Claude Desktop can't do raw http; bridge with mcp-remote):
@@ -164,19 +164,19 @@ cd docs/architecture   # the dir holding workspace.dsl
 # 0. validate the DSL (the purpose-built check); do this before exporting.
 #    Keep STRUCTURIZR_THEMES on every command: without it a workspace using an installed theme
 #    (e.g. amazon-web-services-2025.07) fails to parse ("Theme ... does not exist").
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright \
   validate -workspace workspace.dsl
 
 # 1. (fallback path) DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright \
   export -workspace workspace.dsl -format mermaid  -output exports
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright \
   export -workspace workspace.dsl -format plantuml -output exports
 
 # 2. PlantUML -> PNG + SVG (rasterise; needs no network)
 cd exports
-docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml -tpng "structurizr-*.puml"
-docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml -tsvg "structurizr-*.puml"
+docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml:1.2026.10 -tpng "structurizr-*.puml"
+docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml:1.2026.10 -tsvg "structurizr-*.puml"
 ```
 
 Notes:
@@ -210,7 +210,7 @@ Notes:
   (Small 1–20 £300/mo, Medium 21–50 £600/mo, Large 51–100 £900/mo, Enterprise 101+ by quote,
   billed annually). Don't quote these as current without checking; pricing drifts.
 - **`server` does not start from the prebuilt image without a license.** The announcement's
-  quickstart labels `docker run ... structurizr/structurizr server` "open core version", which is
+  quickstart labels the `server` subcommand "open core version", which is
   misleading: on v2026.10.26 the container boots, prints its config, logs the lines below, and
   exits 1.
 
@@ -241,7 +241,7 @@ Structurizr publishes an official **`<release>-playwright`** tag (Microsoft's Pl
 the same war + the bundled themes) that can. Pin the release:
 
 ```bash
-img=structurizr/structurizr:2026.10.26-playwright   # newest *-playwright tag on Docker Hub
+img=structurizr/structurizr:2026.10.26-playwright   # the tested release (see SKILL.md, Pinned images)
 run() { docker run --rm --ipc=host -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
           -v "$PWD:/work" -w /work "$img" "$@"; }
 cd docs/architecture
@@ -312,5 +312,5 @@ With Docker, the same playground runs **locally**: worth offering when the DSL i
 you'd rather it never left the machine:
 
 ```bash
-docker run -it --rm -p 8080:8080 structurizr/structurizr playground
+docker run -it --rm -p 8080:8080 structurizr/structurizr:2026.10.26-playwright playground
 ```

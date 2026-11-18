@@ -44,6 +44,14 @@ tool is installed.
 > `server` subcommands. The **cloud service is end-of-life with no replacement**; never point a
 > user at it. See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for the full map.
 
+**Pinned images.** Run exactly these tags, never a bare name or `latest`: an upstream push would
+otherwise change what runs on the user's machine. They are the versions this skill is tested
+against (`evals/render/test.sh`).
+
+- `structurizr/structurizr:2026.10.26-playwright`
+- `structurizr/mcp:2026.04.20`
+- `plantuml/plantuml:1.2026.10`
+
 On first use, look for the config file `.c4-diagrams.json` at the repo root. If it is
 missing, run the **setup flow** in [references/runtime-and-mcp.md](references/runtime-and-mcp.md):
 probe for `docker` and a browser, ask the user which tier they want (offer to

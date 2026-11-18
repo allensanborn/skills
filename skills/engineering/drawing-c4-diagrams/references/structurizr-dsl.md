@@ -323,7 +323,7 @@ and the [themes](https://docs.structurizr.com/server/diagrams/themes) and
   `Elastic Container Service`, `Fargate`, `Lambda`, `Aurora`, `ElastiCache`,
   `Simple Storage Service`, `OpenSearch Service`, `Simple Queue Service`, `Simple Email Service`,
   `Cognito`. There is no Availability Zone tag. List a version's tags with
-  `docker run --rm --entrypoint cat structurizr/structurizr /usr/local/structurizr-themes/<name>/theme.json`.
+  `docker run --rm --entrypoint cat structurizr/structurizr:2026.10.26-playwright /usr/local/structurizr-themes/<name>/theme.json`.
 - **Icons go on the deployment view only**: tag `deploymentNode`s and `infrastructureNode`s, never
   the logical containers (an Aurora icon on the "Database" container conflates C4 levels).
 - Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the

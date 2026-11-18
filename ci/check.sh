@@ -47,6 +47,16 @@ echo "==> skill-lint"
 # one-level references, referenced-files-exist, <500 lines.
 npx --yes skill-lint ./skills
 
+echo "==> docker images in skills are pinned, and match the render test"
+c4=skills/engineering/drawing-c4-diagrams
+unpinned=$(grep -rnE 'docker (run|pull)|--entrypoint' "$c4/SKILL.md" "$c4/references" \
+  | grep -E '(structurizr/structurizr|structurizr/mcp|plantuml/plantuml)([^:/a-z-]|$)' || true)
+if [ -n "$unpinned" ]; then echo "UNPINNED image:"; echo "$unpinned"; exit 1; fi
+for var in STRUCTURIZR PLANTUML; do
+  img=$(sed -nE "s/^$var=(.*)/\1/p" "$c4/evals/render/test.sh")
+  grep -qF "\`$img\`" "$c4/SKILL.md" || { echo "SKILL.md Pinned images lacks $img (from test.sh)"; exit 1; }
+done
+
 echo "==> reference link check (one level deep, files exist)"
 fail=0
 while IFS= read -r skill; do
