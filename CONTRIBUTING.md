@@ -49,6 +49,34 @@ dagger call render-test --source=.
 bash ci/check.sh
 ```
 
+## Reviewing
+
+Every change reaches `main` through a pull request whose six CI checks pass. A review is the part CI can't do: does the change say what it means, and does it still hold together?
+
+### What to check, by kind of change
+
+| The PR changes | Check |
+| --- | --- |
+| A skill's behaviour (`SKILL.md`, `references/`) | An eval case covers it (added or updated), the docs page in `docs/<bucket>/` still matches, and there's a changeset. Every constraint in the old wording ("hard to skip", tier numbers, command names) survives the new one. |
+| A skill's evals | `evals.json`, each `case.yaml`, and the `graders/` bodies say the same thing; graders check behaviour, not wording. |
+| Samples (`docs/examples/`) | They are real, unedited runs: the README names the commit and flags, and any edit to model output is disclosed. |
+| Workflows (`.github/`) | Actions are pinned to a commit SHA with the version in a comment; permissions are the least the job needs; any `zizmor: ignore` says why. |
+| Prose anywhere | Plain words, no em-dashes (Vale enforces it), links resolve. |
+
+### How to approve
+
+Leave the review on GitHub ("Approve", or "Request changes" with what is wrong and why). The author merges once it's approved and green.
+
+### Adding a second reviewer
+
+A second person's approval is what moves OpenSSF Scorecard's Code-Review and Branch-Protection checks; an author can't approve their own PR, and a bot approval would only game them. When someone joins:
+
+1. Give them the **Write** role on the repository.
+2. Add them to `.github/CODEOWNERS`, by area if you split the work (for example `/.github/` for workflows, `/skills/` for skill content).
+3. In the "Protect main" ruleset, set required approvals to **1** and turn on "Require review from Code Owners" and "Dismiss stale approvals".
+
+Until then approvals stay optional, so a solo maintainer can merge.
+
 ## Issue tracking (beads)
 
 Issues live in a local Dolt database and travel on **`refs/dolt/data`** on this repo's git
