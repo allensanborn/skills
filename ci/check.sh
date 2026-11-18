@@ -42,15 +42,18 @@ fi
 echo "==> plugin.json version matches package.json"
 node scripts/sync-plugin-version.mjs --check
 
+echo "==> script tests, with coverage floors (90% lines, 80% branches)"
+npm test --silent
+
 echo "==> skill-lint"
 # Validates SKILL.md name/description limits, allowed frontmatter fields,
 # one-level references, referenced-files-exist, <500 lines.
 npx --yes skill-lint ./skills
 
-echo "==> docker images in skills are pinned, and match the render test"
+echo "==> docker images in skills are pinned by digest, and match the render test"
 c4=skills/engineering/drawing-c4-diagrams
-unpinned=$(grep -rnE 'docker (run|pull)|--entrypoint' "$c4/SKILL.md" "$c4/references" \
-  | grep -E '(structurizr/structurizr|structurizr/mcp|plantuml/plantuml)([^:/a-z-]|$)' || true)
+unpinned=$(grep -rnE 'docker (run|pull)|--entrypoint|^[[:space:]]+(structurizr|plantuml)/' "$c4/SKILL.md" "$c4/references" \
+  | grep -E '(structurizr/structurizr|structurizr/mcp|plantuml/plantuml)(:[A-Za-z0-9._-]+)?([^@:A-Za-z0-9._/-]|$)' || true)
 if [ -n "$unpinned" ]; then echo "UNPINNED image:"; echo "$unpinned"; exit 1; fi
 for var in STRUCTURIZR PLANTUML; do
   img=$(sed -nE "s/^$var=(.*)/\1/p" "$c4/evals/render/test.sh")

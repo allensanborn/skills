@@ -222,7 +222,8 @@ also **required** for `generate system-landscape` (the rollup is what the genera
 from a base by tag. Two hard limits make them a poor fit for committed images:
 
 - the **base view must use manual layout**: `autolayout` on a filtered view's base is rejected;
-- the **headless export silently skips filtered views**: only the base is written
+- **headless export writes only one of the pair**: PlantUML/Mermaid write the base and skip the
+  filtered view, PNG/SVG write the filtered view and skip the base
   ([runtime-and-mcp.md](runtime-and-mcp.md)).
 
 So for repo images, author a "clean" and a "full" view **explicitly** (one `include *`, one that
@@ -331,7 +332,7 @@ and the [themes](https://docs.structurizr.com/server/diagrams/themes) and
   `Elastic Container Service`, `Fargate`, `Lambda`, `Aurora`, `ElastiCache`,
   `Simple Storage Service`, `OpenSearch Service`, `Simple Queue Service`, `Simple Email Service`,
   `Cognito`. There is no Availability Zone tag. List a version's tags with
-  `docker run --rm --entrypoint cat structurizr/structurizr:2026.10.26-playwright /usr/local/structurizr-themes/<name>/theme.json`.
+  `docker run --rm --entrypoint cat structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 /usr/local/structurizr-themes/<name>/theme.json`.
 - **Icons go on the deployment view only**: tag `deploymentNode`s and `infrastructureNode`s, never
   the logical containers (an Aurora icon on the "Database" container conflates C4 levels).
 - Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the

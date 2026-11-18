@@ -44,13 +44,13 @@ tool is installed.
 > `server` subcommands. The **cloud service is end-of-life with no replacement**; never point a
 > user at it. See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for the full map.
 
-**Pinned images.** Run exactly these tags, never a bare name or `latest`: an upstream push would
-otherwise change what runs on the user's machine. They are the versions this skill is tested
-against (`evals/render/test.sh`).
+**Pinned images.** Run exactly these references, tag and digest, never a bare name or `latest`:
+the digest makes Docker refuse anything but the image this skill was tested against
+(`evals/render/test.sh`), even if upstream re-pushes the tag.
 
-- `structurizr/structurizr:2026.10.26-playwright`
-- `structurizr/mcp:2026.04.20`
-- `plantuml/plantuml:1.2026.10`
+- `structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1`
+- `structurizr/mcp:2026.04.20@sha256:fc4ef98b7da925d62b08c71a90eb995a527fae30e2c04b39e3041f253c135539`
+- `plantuml/plantuml:1.2026.10@sha256:2cf2f097652701319e29b9e6a809e68d4ddb06fbeeb696705c097da8fa6d0507`
 
 On first use, look for the config file `.c4-diagrams.json` at the repo root. If it is
 missing, run the **setup flow** in [references/runtime-and-mcp.md](references/runtime-and-mcp.md):
@@ -115,6 +115,10 @@ repeat):
 
 - **Validate:** with MCP connected, the `structurizr-mcp:*` DSL tools; otherwise (Tier 1) the headless
   `validate` below.
+- **Explain a parse error in C4 terms, not just syntax.** Most DSL errors are a modeling mistake
+  the parser happens to catch: a `container` outside its `softwareSystem` is a running part
+  orphaned from the system it belongs to; a component outside a container has nothing to run in.
+  Say what the model got wrong, then the fix.
 - **Preview:** with MCP, export a **Mermaid** view inline (renders in chat/Markdown, no browser).
 - **Verify each view isn't empty.** Parsing OK ≠ view correct: a misscoped `include`/`exclude`
   renders **0 elements**. Check the per-view element/relationship counts (from the exported
@@ -124,9 +128,17 @@ repeat):
   [references/diagram-review-checklist.md](references/diagram-review-checklist.md) (*Inspections*).
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
-fallbacks. If Docker is present but MCP is not connected, use **`structurizr/structurizr validate
--workspace workspace.dsl`** as the inner loop: it is the purpose-built parse check and writes no
-files. A failed `export` (parser exception / non-zero exit) is the same signal when you were
+fallbacks. If Docker is present but MCP is not connected, use `validate` on the pinned image as
+the inner loop: it is the purpose-built parse check and writes no files. Give the user this exact
+command too, never a bare image name:
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work \
+  structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
+  validate -workspace workspace.dsl
+```
+
+A failed `export` (parser exception / non-zero exit) is the same signal when you were
 exporting anyway. At Tier 0 (no Docker), validate by careful reading and give the user the DSL
 plus a Mermaid export to paste into `playground.structurizr.com`.
 

@@ -5,11 +5,12 @@
 // Runs as part of `npm run version`, immediately after `changeset version`.
 // With --check it changes nothing and exits 1 if the two versions differ.
 
-import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+// Run from the repo root (npm scripts and ci/check.sh do).
 
-const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+
+const repo = process.cwd();
 const pluginPath = join(repo, ".claude-plugin", "plugin.json");
 
 const { version } = JSON.parse(readFileSync(join(repo, "package.json"), "utf8"));

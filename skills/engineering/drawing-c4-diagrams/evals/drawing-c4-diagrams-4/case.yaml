@@ -2,5 +2,5 @@ schema_version: "1.1"
 name: drawing-c4-diagrams-4
 expected_outcome: |
   Validates with whatever tier is available: MCP tools if connected, otherwise headless `structurizr/structurizr validate -workspace workspace.dsl` (a parser exception / non-zero exit is the validation signal; a failed `export` is the same signal), or careful reading at Tier 0
-  Runs a validate -> fix -> re-validate loop until the DSL parses
+  Runs a validate -> fix -> re-validate loop until the DSL parses Docker is blocked inside the `claude plugin eval` sandbox, so a run that attempts this with the correct command and then says plainly it could not render or verify (rather than claiming it did) also passes; the rendering itself is tested by `dagger call render-test`.
   Explains what was wrong in C4 terms, not just syntax
