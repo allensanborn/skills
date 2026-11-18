@@ -49,6 +49,22 @@ dagger call render-test --source=.
 bash ci/check.sh
 ```
 
+## Release app
+
+Releases are cut by `.github/workflows/release.yml` (changesets). It opens the "chore: version skills" pull request with a GitHub App token, because a pull request opened with the default `GITHUB_TOKEN` triggers no workflows, so it would never get the CI checks that `main` requires. One-time setup, by the repo owner:
+
+1. Create an app at <https://github.com/settings/apps/new>: any name, homepage `https://github.com/allensanborn/skills`, **Webhook: inactive**. Repository permissions: **Contents: read and write**, **Pull requests: read and write** (Metadata: read is added automatically). Installable "Only on this account".
+2. On the app's page, note the **Client ID**, and **Generate a private key** (a `.pem` downloads).
+3. **Install App** on `allensanborn/skills` only.
+4. Store both on the repo, then delete the local `.pem`:
+
+   ```bash
+   gh variable set RELEASE_APP_CLIENT_ID --body "<client id>"
+   gh secret set RELEASE_APP_PRIVATE_KEY < path/to/key.pem
+   ```
+
+The workflow asks for a token scoped to contents and pull requests only, which expires after an hour.
+
 ## Issue tracking (beads)
 
 Issues live in a local Dolt database and travel on **`refs/dolt/data`** on this repo's git
