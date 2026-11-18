@@ -26,29 +26,6 @@ Agents are welcome to help, but you post the issue, so you own it:
 
 GitHub Issues are the intake for outside reports. Maintainer work lives in beads (below). When a GitHub issue is accepted (`ready-for-agent` or `ready-for-human`, see [`docs/agents/triage-labels.md`](./docs/agents/triage-labels.md)), file a bead that links it, and close the issue when the bead closes.
 
-## Develop
-
-Skills follow [Anthropic's authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices):
-lean `SKILL.md` (<500 lines), progressive disclosure via `references/` (one level deep),
-third-person "pushy" descriptions, forward-slash paths, evals-first.
-
-Quality checks run in containers via [Dagger](https://dagger.io), so they behave the same locally and
-in CI. `.github/workflows/ci.yml` runs every one of them on each pull request and on `main`; see
-[`.dagger/`](.dagger/) for the functions and [SECURITY.md](./SECURITY.md) for what else guards the repo.
-
-```bash
-# via Dagger: lint, prose lint, and the drawing-c4-diagrams render test (Docker + network)
-dagger call lint --source=.
-dagger call markdownlint --source=.   # .markdownlint-cli2.jsonc
-dagger call vale --source=.           # .vale.ini, House style (no em-dashes)
-dagger call gitleaks --source=.       # secrets in the working tree
-dagger call zizmor --source=.         # security lint of .github/workflows
-dagger call render-test --source=.
-
-# local: AGENTS/CLAUDE parity, plugin manifest + validate, version sync, skill-lint, links
-bash ci/check.sh
-```
-
 ## Reviewing
 
 Every change reaches `main` through a pull request whose six CI checks pass. A review is the part CI can't do: does the change say what it means, and does it still hold together?
@@ -76,6 +53,29 @@ A second person's approval is what moves OpenSSF Scorecard's Code-Review and Bra
 3. In the "Protect main" ruleset, set required approvals to **1** and turn on "Require review from Code Owners" and "Dismiss stale approvals".
 
 Until then approvals stay optional, so a solo maintainer can merge.
+
+## Develop
+
+Skills follow [Anthropic's authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices):
+lean `SKILL.md` (<500 lines), progressive disclosure via `references/` (one level deep),
+third-person "pushy" descriptions, forward-slash paths, evals-first.
+
+Quality checks run in containers via [Dagger](https://dagger.io), so they behave the same locally and
+in CI. `.github/workflows/ci.yml` runs every one of them on each pull request and on `main`; see
+[`.dagger/`](.dagger/) for the functions and [SECURITY.md](./SECURITY.md) for what else guards the repo.
+
+```bash
+# via Dagger: lint, prose lint, and the drawing-c4-diagrams render test (Docker + network)
+dagger call lint --source=.
+dagger call markdownlint --source=.   # .markdownlint-cli2.jsonc
+dagger call vale --source=.           # .vale.ini, House style (no em-dashes)
+dagger call gitleaks --source=.       # secrets in the working tree
+dagger call zizmor --source=.         # security lint of .github/workflows
+dagger call render-test --source=.
+
+# local: AGENTS/CLAUDE parity, plugin manifest + validate, version sync, skill-lint, links
+bash ci/check.sh
+```
 
 ## Issue tracking (beads)
 
