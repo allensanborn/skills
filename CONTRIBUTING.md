@@ -80,6 +80,12 @@ dagger call render-test --source=.
 bash ci/check.sh
 ```
 
+With Nix (flakes on), `nix develop` gives you Node 22 and the lint and release tools (actionlint,
+markdownlint-cli2, vale, gitleaks, zizmor, slsa-verifier, gh, jq) from `flake.nix`; with
+[direnv](https://direnv.net) hooked into your shell, `direnv allow` loads it whenever you `cd` in.
+Dagger isn't in nixpkgs: install the version `ci.yml` pins. `nix flake update` refreshes
+`flake.lock`.
+
 `render-test` renders `evals/render/aws-deployment.dsl` through every export path and runs
 `evals/render/test.sh --check` on the output; the image and theme pins are mirrored in
 `test.sh` and `.dagger/src/index.ts`, so bump them together. Without Dagger, run `test.sh`

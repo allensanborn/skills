@@ -17,3 +17,6 @@ node_modules/
 
 # claude plugin eval writes the resumed session next to a history_file case
 skills/*/*/evals/*/[0-9a-f]*-*-*-*-*.jsonl
+
+# direnv + nix (use flake)
+.direnv/
