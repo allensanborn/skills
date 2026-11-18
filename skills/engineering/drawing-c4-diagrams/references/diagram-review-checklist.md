@@ -111,13 +111,20 @@ the review, not optional.
       **1920 px** (if the user hasn't said where it goes, assume a README). Structurizr draws
       names and relationship labels at 24 px, so labels shrink to `24 × target ÷ image width`
       px, and below about 7 px they can't be read. That puts the **image width budget at about
-      3× the target**: roughly 2600 px for a README, 5800 px for a slide. Read the width from
-      the export (`file exports/<key>.png`, or the SVG's `width`), and if a resize tool is
-      available (`sips --resampleWidth 880`, ImageMagick) look at the shrunk copy too. Over
-      budget means split the view (see [patterns](patterns-and-pitfalls.md#modeling-patterns-common-use-cases));
-      as a rule of thumb that starts happening past about **12-15 elements**. Wider
-      `autolayout` spacing makes it worse; `tb` is usually narrower than `lr` for a deep
-      nesting of deployment nodes.
+      3.4× the target**: roughly **3000 px for a README**, 6500 px for a slide. Read the width
+      from the export (`file exports/<key>.png`, or the SVG's `width`), and if a resize tool is
+      available (`sips --resampleWidth 880`, ImageMagick) look at the shrunk copy too.
+      Over budget, fix it before showing the user; don't just offer to. In this order:
+      1. **Tighten the spacing.** Arrows' labels between two rows sit side by side in that gap,
+         so a few elements with many labelled arrows still render wide; external systems also
+         land in the bottom row beside the boundary, leaving an empty corner the automatic
+         layout can't remove. `autolayout tb 200 50` (rank, node separation) instead of the
+         default 300/300 cut a 6-element container view from 3345 to 2878 px (v2026.10.26).
+         Wider spacing only makes it worse.
+      2. **Try the other direction.** `tb` is usually narrower than `lr`, especially for deeply
+         nested deployment nodes; measure both if the first is still over.
+      3. **Split the view** (see [patterns](patterns-and-pitfalls.md#modeling-patterns-common-use-cases)).
+         Past about **12-15 elements** this is usually the only fix.
 - [ ] **Styling survives the export**: Do the ownership colours, shapes, borders, and legend
       render as intended in the format you're shipping? PlantUML and Mermaid style differently,
       and a generated workspace has **no theme** unless you add one.

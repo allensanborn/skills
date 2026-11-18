@@ -137,7 +137,8 @@ Review has **two passes**, both driven by [references/diagram-review-checklist.m
    that are visually broken: empty views, a view that pulled in the whole landscape, hairballs,
    overlapping boxes, orphans. These are invisible in the source. Judge legibility at the size
    it will be **viewed**, not the size it was rendered: check each image's width against the
-   budget in the checklist (about 3× the display width) and split any view that's over it.
+   budget in the checklist (about 3.4× the display width) and fix any view that's over it:
+   tighter spacing first, then the other direction, then a split.
 2. **The content grill**: walk the **Section C** review questions in the grill bank: challenge
    each box's abstraction level, demand a label + direction for every relationship, flag missing
    externals and omitted technology. Length scales with the diagram, not a fixed count.
