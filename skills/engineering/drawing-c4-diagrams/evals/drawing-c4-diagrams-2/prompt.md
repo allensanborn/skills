@@ -5,4 +5,4 @@ timeout_seconds: 600
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
 ---
 
-Here's a photo of my whiteboard. Turn it into a diagram.
+Here's a photo of my whiteboard, `whiteboard.png`. Turn it into a diagram.

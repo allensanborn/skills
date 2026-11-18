@@ -115,21 +115,21 @@ Render one view per level. `include *` pulls in the relevant elements; always se
 views {
     systemContext bank "SystemContext" "The big picture." {
         include *
-        autolayout lr
+        autolayout tb
     }
     container bank "Containers" {
         include *
-        autolayout lr
+        autolayout tb
     }
     component api "Components" {
         include *
-        autolayout lr
+        autolayout tb
     }
     dynamic bank "SignIn" "How a user signs in." {
         user -> spa "Enters credentials"
         spa -> api "Validates credentials"
         api -> db "Looks up user"
-        autolayout lr
+        autolayout tb
     }
 }
 ```
@@ -157,7 +157,7 @@ Deployment views map container **instances** onto infrastructure:
 ```text
     deployment bank "Live" "LiveDeployment" {
         include *
-        autolayout lr
+        autolayout tb
     }
 ```
 
@@ -229,12 +229,20 @@ So for repo images, author a "clean" and a "full" view **explicitly** (one `incl
 `exclude`s the noisy tag/element). Filtered views are fine only when the audience browses the
 live Structurizr server.
 
-**Layout.** `autolayout <lr|rl|tb|bt> [rankSep] [nodeSep]`: e.g. `autolayout lr 300 150` widens
-spacing; `tb` often untangles a fan-in that `lr` crowds. But note the **image-source caveat**:
-PlantUML/Mermaid do their *own* layout on export, so `autolayout` mainly drives the interactive
-server, where vNext's upgraded Dagre routes arrows and labels noticeably better than Lite did.
-For a dense view, the fix is still **fewer edges** (exclude the cross-cutting ones), not layout
-knobs.
+**Layout.** `autolayout <tb|bt|lr|rl> [rankSep] [nodeSep]`. **Default to `tb`**: diagrams should
+grow taller, never wider, because a viewer shrinks a wide image to fit and the labels go with it,
+while a tall one just scrolls. `lr` is for the view you have measured and found narrower that way.
+Tight spacing (`autolayout tb 200 50`) is narrower than the default 300/300; wider spacing only
+makes it worse. The width budget and the fix order are in
+[diagram-review-checklist.md](diagram-review-checklist.md) (*Legibility at size*).
+
+**Never hand-tune the layout.** Nudging label offsets or dragging boxes is a treadmill that breaks
+on the next model change. When a view renders badly, fix its structure: **split** it into slices
+of one concern each (about 4-6 elements), **exclude** the cross-cutting externals and let the slices
+carry them, or **shorten** relationship labels and move the detail into prose.
+
+Only Structurizr's own renderer (the `-playwright` image's PNG/SVG export, or the local server)
+uses `autolayout`. PlantUML and Mermaid exports lay the view out themselves.
 
 **Verify before trusting a view.** A misscoped `include`/`exclude` can yield an **empty** view
 (0 elements) that renders as a blank box: a silent failure. Check the per-view element and

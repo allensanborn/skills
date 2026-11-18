@@ -68,12 +68,12 @@ workspace extends ../system-catalog/workspace.dsl {
     views {
         systemContext <catalogId> "Context" {
             include *
-            autolayout lr
+            autolayout tb
         }
         container <catalogId> "Containers" {
             include *
             exclude obsPlatform
-            autolayout lr
+            autolayout tb
         }
         # base styles live here; never `theme default` (dead host)
         !include ../_shared/styles.dsl

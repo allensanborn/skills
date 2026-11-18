@@ -36,7 +36,7 @@ tool is installed.
 | Tier | Needs | You can |
 | --- | --- | --- |
 | **0: always** | nothing | author + eyeball-validate DSL, export **Mermaid** as text, tell the user to paste it into the playground at **`playground.structurizr.com`** |
-| **1: +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (Structurizr's own layout via the official `<release>-playwright` image; PlantUML is the fallback), cloud provider **icons** (AWS/Azure/GCP/OCI/K8s themes bundled in the image), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
+| **1: +Docker** (the practical default) | Docker | **headless** `structurizr/structurizr`: `validate` (parse check), render **PNG/SVG** (Structurizr's own layout via the official `<release>-playwright` image; the fallback is the `plantuml/c4plantuml` export, since plain `plantuml` renders grey boxes), cloud provider **icons** (AWS/Azure/GCP/OCI/K8s themes bundled in the image), `inspect` (model lint), `generate system-landscape`, `playground` (local editor). **No MCP or browser required.** |
 | **2: +MCP and/or browser** | Docker + MCP / a browser | **MCP** (`structurizr/mcp`): fast in-chat validate + Mermaid/PlantUML preview (inner loop). **`structurizr/structurizr local`**: interactive render + layout tweaks at `http://localhost:8080` (outer loop). |
 
 > **Naming:** Structurizr vNext consolidated Lite, the CLI, and the on-premises install into the
