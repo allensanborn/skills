@@ -1,5 +1,8 @@
 # Skills
 
+[![CI](https://github.com/allensanborn/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/allensanborn/skills/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/allensanborn/skills/badge)](https://scorecard.dev/viewer/?uri=github.com/allensanborn/skills)
+
 Agent skills for Claude Code and other [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) harnesses, built on the conventions of [mattpocock/skills](https://github.com/mattpocock/skills): small, composable, and each one makes you think rather than doing the thinking for you.
 
 ## Installation

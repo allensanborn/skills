@@ -32,15 +32,17 @@ Skills follow [Anthropic's authoring best practices](https://platform.claude.com
 lean `SKILL.md` (<500 lines), progressive disclosure via `references/` (one level deep),
 third-person "pushy" descriptions, forward-slash paths, evals-first.
 
-Quality checks run in a container via [Dagger](https://dagger.io) (portable, no metered CI
-minutes). See [`.dagger/`](.dagger/). GitHub Actions are added only once a skill is
-proven ship-ready.
+Quality checks run in containers via [Dagger](https://dagger.io), so they behave the same locally and
+in CI. `.github/workflows/ci.yml` runs every one of them on each pull request and on `main`; see
+[`.dagger/`](.dagger/) for the functions and [SECURITY.md](./SECURITY.md) for what else guards the repo.
 
 ```bash
 # via Dagger: lint, prose lint, and the drawing-c4-diagrams render test (Docker + network)
 dagger call lint --source=.
 dagger call markdownlint --source=.   # .markdownlint-cli2.jsonc
 dagger call vale --source=.           # .vale.ini, House style (no em-dashes)
+dagger call gitleaks --source=.       # secrets in the working tree
+dagger call zizmor --source=.         # security lint of .github/workflows
 dagger call render-test --source=.
 
 # local: AGENTS/CLAUDE parity, plugin manifest + validate, version sync, skill-lint, links
