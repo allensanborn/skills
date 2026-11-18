@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Allen Sanborn
 // Copies package.json's version into .claude-plugin/plugin.json.
 // Runs as part of `npm run version`, immediately after `changeset version`.
 // With --check it changes nothing and exits 1 if the two versions differ.

@@ -1,6 +1,7 @@
 ---
 name: drawing-c4-diagrams
 description: Create and refine C4-model software architecture diagrams as Structurizr DSL, validated and rendered locally, and interrogate the user Socratically so they engage with and defend the design instead of passively accepting generated output. Use whenever the user wants to diagram, visualize, or document software architecture; mentions C4, system context / container / component diagrams, Structurizr, "draw the architecture", "architecture diagram", or pastes a whiteboard/hand-drawn/existing diagram image to turn into a diagram.
+license: MIT
 ---
 
 # Drawing C4 diagrams
