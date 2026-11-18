@@ -51,3 +51,8 @@ jobs:
           publish-script: npx changeset tag
           commit-message: "chore: version skills"
           pr-title: "chore: version skills"
+          # Tags only, no GitHub Release: Scorecard scores an unsigned release 0 on
+          # Signed-Releases (dropping the total ~0.5), while no releases is neutral.
+          # Revisit once releases carry signatures/provenance (bead).
+          create-github-releases: false
+          push-git-tags: true
