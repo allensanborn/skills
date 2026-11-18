@@ -162,7 +162,8 @@ Review has **two passes**, both driven by [references/diagram-review-checklist.m
    overlapping boxes, orphans. These are invisible in the source. Judge legibility at the size
    it will be **viewed**, not the size it was rendered: check each image's width against the
    budget in the checklist (about 3.4× the display width) and fix any view that's over it:
-   tighter spacing first, then the other direction, then a split.
+   tighter spacing first, then the other direction, then a split. If you can't render, split any
+   README-bound view of more than about 8 elements rather than guessing that spacing is enough.
 2. **The content grill**: walk the **Section C** review questions in the grill bank: challenge
    each box's abstraction level, demand a label + direction for every relationship, flag missing
    externals and omitted technology. Length scales with the diagram, not a fixed count.

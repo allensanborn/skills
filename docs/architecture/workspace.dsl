@@ -13,8 +13,8 @@ workspace "drawing-c4-diagrams" "The skill's toolchain, its render paths, and ho
             themes = container "Bundled themes" "16 provider themes (theme.json + vendor PNGs) at /usr/local/structurizr-themes." "Files in the image" "Files"
             local = container "Structurizr local" "Interactive render and layout editing at :8080." "Docker: structurizr/structurizr local"
             mcp = container "Structurizr MCP" "In-chat validate and Mermaid/PlantUML preview." "Docker: structurizr/mcp"
-            plantuml = container "PlantUML renderer" "Renders .puml; fetches https icons and embeds them." "Docker: plantuml/plantuml:1.2026.10"
-            mermaid = container "mermaid-cli" "Renders .mmd; SVG keeps icons as remote <img> URLs." "Docker: minlag/mermaid-cli:12.0.0"
+            plantuml = container "PlantUML renderer" "Renders .puml; fetches https icons and embeds them." "Docker: plantuml/plantuml"
+            mermaid = container "mermaid-cli" "Renders .mmd; SVG keeps icons as remote <img> URLs." "Docker: minlag/mermaid-cli"
             exports = container "exports/" "PNG, SVG, .puml, .mmd, legend keys." "Files" "Files"
         }
 
@@ -60,7 +60,7 @@ workspace "drawing-c4-diagrams" "The skill's toolchain, its render paths, and ho
                     containerInstance toolchain.exports
                 }
                 deploymentNode "OrbStack" "" "Docker" {
-                    deploymentNode "structurizr/structurizr:2026.10.26-playwright" "" "Docker container" {
+                    deploymentNode "structurizr/structurizr (-playwright)" "" "Docker container" {
                         containerInstance toolchain.cli
                         containerInstance toolchain.themes
                     }
@@ -70,10 +70,10 @@ workspace "drawing-c4-diagrams" "The skill's toolchain, its render paths, and ho
                     deploymentNode "structurizr/mcp" "" "Docker container" {
                         containerInstance toolchain.mcp
                     }
-                    deploymentNode "plantuml/plantuml:1.2026.10" "" "Docker container" {
+                    deploymentNode "plantuml/plantuml" "" "Docker container" {
                         containerInstance toolchain.plantuml
                     }
-                    deploymentNode "minlag/mermaid-cli:12.0.0" "" "Docker container" {
+                    deploymentNode "minlag/mermaid-cli" "" "Docker container" {
                         containerInstance toolchain.mermaid
                     }
                 }
