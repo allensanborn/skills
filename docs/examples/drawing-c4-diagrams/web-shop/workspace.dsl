@@ -1,51 +1,47 @@
-workspace "Web Shop" "C4 model of the Web Shop, for onboarding new engineers." {
+workspace "Web Shop" "C4 System Context and Container diagrams for Web Shop, for onboarding new engineers." {
 
     model {
         !impliedRelationships true
 
-        customer = person "Customer" "Browses products, places orders, pays by card, and receives order emails."
+        customer = person "Customer" "Someone who browses products and buys from the shop."
 
-        webShop = softwareSystem "Web Shop" "Lets customers browse products, place orders, and pay online." {
-            spa = container "Single-Page App" "Product browsing, cart, checkout, and account screens in the customer's browser." "React"
-            api = container "API Application" "Serves the SPA bundle; handles business logic, customer login, orders, and payment confirmation via a JSON API." "Java/Spring Boot"
-            db = container "Database" "Stores customer accounts, products, orders, and payment status." "PostgreSQL" {
+        webShop = softwareSystem "Web Shop" "Lets customers browse products, place orders, and pay by card." {
+            spa = container "Single-Page Application" "The storefront UI: product browsing, cart, checkout, and account pages." "React" {
+                tags "Browser"
+            }
+            api = container "API Application" "Serves the SPA bundle; handles business logic, customer login, orders, and payments behind a JSON API." "Java, Spring Boot"
+            db = container "Database" "Stores customers and their credentials, products, carts, and orders." "PostgreSQL" {
                 tags "Database"
             }
         }
 
-        stripe = softwareSystem "Stripe" "Third-party card payment processor." {
-            tags "External"
-        }
-        ses = softwareSystem "Amazon SES" "Amazon Simple Email Service; delivers transactional email." {
-            tags "External"
-        }
+        stripe = softwareSystem "Stripe" "Payment processor that handles card details and charges." "External"
+        ses = softwareSystem "Amazon SES" "Amazon Simple Email Service: delivers transactional email." "External"
 
-        # Context-level edges, declared explicitly so the rolled-up labels read well
-        customer -> webShop "Browses products, places orders, and pays using" "Web browser"
+        # System-level edge declared first so the context view gets a clear label
+        # instead of whichever container-level edge would otherwise be rolled up.
         webShop -> stripe "Takes card payments through" "HTTPS"
-        stripe -> webShop "Notifies of payment events" "Webhooks/HTTPS"
-        webShop -> ses "Sends order and account emails using" "SMTP"
-        ses -> customer "Delivers emails to" "Email"
 
-        # Container-level edges
-        customer -> spa "Browses, checks out, and enters card details in" "Web browser"
+        customer -> spa "Browses products and places orders using" "Web browser"
+        api -> spa "Delivers the SPA's static bundle to the customer's browser" "HTTPS"
         spa -> api "Makes API calls to" "JSON/HTTPS"
-        spa -> stripe "Collects card details with Stripe Elements and sends them to" "Stripe.js/HTTPS"
+        spa -> stripe "Sends card details to, via Stripe Elements" "HTTPS"
+        api -> stripe "Confirms payments using" "JSON/HTTPS"
+        stripe -> api "Sends payment event webhooks to" "HTTPS"
         api -> db "Reads from and writes to" "SQL/JDBC"
-        api -> stripe "Creates and confirms payments using" "Stripe API/HTTPS"
-        stripe -> api "Sends payment event webhooks to" "Webhooks/HTTPS"
         api -> ses "Sends order and account emails using" "SMTP"
+        ses -> customer "Delivers emails to" "Email"
     }
 
     views {
-        systemContext webShop "SystemContext" "Web Shop and the people and systems around it." {
+        systemContext webShop "SystemContext" "System Context: Web Shop, the people who use it, and the systems it depends on." {
             include *
-            autolayout lr
+            autolayout tb 200 50
         }
 
-        container webShop "Containers" "The applications and data store that make up Web Shop." {
+        container webShop "Containers" "Containers: the applications and data store inside Web Shop." {
             include *
-            autolayout tb 300 300
+            autolayout tb 200 50
         }
 
         styles {
@@ -62,12 +58,15 @@ workspace "Web Shop" "C4 model of the Web Shop, for onboarding new engineers." {
                 background #438dd5
                 color #ffffff
             }
-            element "Database" {
-                shape cylinder
-            }
             element "External" {
                 background #999999
                 color #ffffff
+            }
+            element "Database" {
+                shape cylinder
+            }
+            element "Browser" {
+                shape webbrowser
             }
         }
     }

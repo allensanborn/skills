@@ -1,16 +1,18 @@
 # Sample: web shop (grilled from a one-line prompt)
 
-What a typical first run looks like: a bare request, the **scoping grill** one question at a time, then validated and rendered System Context and Container views, then the first **review grill** question.
+What a typical first run looks like: a bare request, the **scoping grill** one question at a time, then validated and rendered System Context and Container views, then the first **review grill** question changing the model.
 
-Generated 2026-11-17 by running the real skill headless, unedited: `claude -p` with the `allensanborn-skills` plugin loaded from commit `1c96516` (`--plugin-dir`), model `claude-opus-5-5`, Tier 1 (Docker, headless Structurizr `2026.10.26-playwright`, no MCP), user settings excluded (`--setting-sources project,local`) so no personal instructions leaked in. The skill's replies below are verbatim; only the headings between turns are added. Total cost: $2.67 across 8 turns. The user answers were scripted to read like a real developer's: mostly accepting the recommendation, sometimes adding a detail (Amazon SES, Stripe) that the grill then folded in.
+Generated 2026-11-18 by running the real skill headless, unedited: `claude -p` with the `allensanborn-skills` plugin loaded from commit `a22137a` (`--plugin-dir`), model `claude-opus-5-5`, Tier 1 (Docker, headless Structurizr `2026.10.26-playwright`, no MCP), user settings excluded (`--setting-sources project,local`) so no personal instructions leaked in. The skill's replies below are verbatim; only the headings between turns are added. Total cost: $2.86 across 8 turns. The user answers were scripted to read like a real developer's: mostly accepting the recommendation, sometimes adding a detail (Amazon SES, Stripe) that the grill then folded in.
+
+This is the second run. The first used default spacing and drew a 3345 px wide Container view, which shrinks until its labels are about 6 px in a README. The skill now measures each image against its display width, so this run tightened the spacing (`autolayout tb 200 50`) and checked the result.
 
 ## Output
 
-| File | What it is |
+| File | Size |
 | --- | --- |
+| [SystemContext.svg](./SystemContext.svg) | 1387 x 2017 px |
+| [Containers.svg](./Containers.svg) | 2878 x 2883 px |
 | [workspace.dsl](./workspace.dsl) | The one model both views come from |
-| [SystemContext.svg](./SystemContext.svg) | System Context view |
-| [Containers.svg](./Containers.svg) | Container view |
 
 ![System Context](./SystemContext.svg)
 
@@ -20,7 +22,6 @@ Generated 2026-11-17 by running the real skill headless, unedited: `claude -p` w
 
 <!-- Verbatim chat output: chat-style lists and bold leads are kept as written. -->
 <!-- markdownlint-disable MD032 MD034 MD036 -->
-
 ### Turn 1
 
 **User:**
@@ -29,13 +30,17 @@ Generated 2026-11-17 by running the real skill headless, unedited: `claude -p` w
 
 **Skill:**
 
-Your config is already set up: Tier 1 (Docker, headless), with diagrams going in `docs/architecture/`.
+Your config is already set up: Tier 1 (Docker), diagrams go in `docs/architecture/`, and the review grill is on.
 
-Before I write any DSL, I'll ask six short scoping questions, one at a time: **audience, system boundary, one system or many, people, external systems, and C4 level.** Each one comes with a recommended answer, so you can reply "yes" to take it. You've already answered some of this (customers, an SMTP server), so a few will just be confirmations.
+Before I write any DSL, I have six quick scoping questions: audience, the system's boundary, one system or many, people, external systems, and which C4 levels to draw. You've already answered some of them, so most will just be confirming my suggested answer.
 
-**Q1: Audience and purpose.** Who will read these diagrams, and what should they help with? Onboarding a new engineer, a design review, or explaining scope to non-technical stakeholders?
+**Question 1 of 6: Audience and purpose**
 
-*Recommended:* **developers on your team, to give everyone the same picture of how the system fits together.** That means technology labels (React, Spring Boot, PostgreSQL, SMTP) belong on the diagrams.
+Who will read these diagrams, and what should they help with? For example: onboarding a new engineer, a design review, or explaining scope to a non-technical stakeholder.
+
+*My suggestion:* **developers on your team, to share one picture of how the system fits together.** That means showing technology (React, Spring Boot, PostgreSQL, SMTP) on each box and arrow. If the readers are non-technical, I'd leave technology off the System Context view.
+
+Reply "yes" to accept, or tell me who the readers are.
 
 ### Turn 2
 
@@ -45,11 +50,17 @@ Before I write any DSL, I'll ask six short scoping questions, one at a time: **a
 
 **Skill:**
 
-**Q2: The system boundary.** Everything you build and own goes inside one software-system box. Everything else is a person or an external system.
+Got it: developers, for onboarding. Every box and arrow will show its technology.
 
-*Recommended:* **one system, called "Web Shop", containing the React SPA, the Spring Boot API, and the Postgres database.** The SMTP server stays outside it as an external system, because you send mail through it but don't build it.
+**Question 2 of 6: The system's boundary**
 
-Does that match? One thing to check: is the SMTP server something your team runs and configures (e.g. your own Postfix), or a provider like SendGrid/SES? It stays external either way. The answer just changes how we label it.
+What is the one software system these diagrams are about? Everything inside the boundary is part of it; everything else is a person or an external system.
+
+*My suggestion:* **one system (I'll call it "Web Shop" unless you give me its real name) made up of the React SPA, the Spring Boot API, and the Postgres database.**
+
+One thing to settle: you called it "*our* SMTP server." Does your team build and run it as part of this app? If so, it goes inside the boundary as a container. Or is it shared company infrastructure, or a provider like SES or SendGrid? Then it goes outside as an external system. I'd guess **external**: onboarding engineers don't need to know how it works inside, only that the API sends email through it.
+
+What's the system called, and where does the SMTP server belong?
 
 ### Turn 3
 
@@ -59,11 +70,13 @@ Does that match? One thing to check: is the SMTP server something your team runs
 
 **Skill:**
 
-Noted: **Web Shop** is the system, and **Amazon SES** is an external system it sends email through.
+So the system is Web Shop, and Amazon SES goes outside the boundary as an external system. Your team doesn't own it; the API sends email through it.
 
-**Q3: One system or many.** Is Web Shop the only system in this workspace, or does it sit alongside other systems owned by other teams or repos (an admin back-office, a separate payments service, a warehouse system)?
+**Question 3 of 6: One system or many?**
 
-*Recommended:* **one system, one workspace.** That's Structurizr's default and fits a single SPA + API + DB app. If other in-house systems talk to Web Shop, we show them as external boxes on the Context diagram rather than modeling their insides.
+Is Web Shop the only system in scope, or is it one of several systems owned by different teams or repos (an order service, an inventory system, and so on) that you also want on these diagrams?
+
+*My suggestion:* **one system, one workspace.** From what you've described (SPA + API + DB, plus SES), this is a single system owned by a single team. That's Structurizr's default, and it's the simplest model for onboarding. If other internal systems call Web Shop or are called by it, tell me. They'll show up as external systems, not as part of this workspace.
 
 ### Turn 4
 
@@ -73,44 +86,63 @@ Noted: **Web Shop** is the system, and **Amazon SES** is an external system it s
 
 **Skill:**
 
-Stripe matters. It's exactly the kind of external system that gets left off these diagrams. I'll add **Stripe** as an external system next to Amazon SES. One follow-up for later: does the SPA talk to Stripe directly (Stripe.js / Elements for card entry), or does only the API call it? That decides where the arrows go on the Container diagram.
+Yes, Stripe matters. External dependencies like that are the thing most often left off these diagrams. It joins SES as an external system, and I'll ask how it connects in question 5.
 
-**Q4: People.** Who uses Web Shop? You've said "customers". Is anyone else hands-on, such as staff who manage products and orders, or support agents handling refunds?
+**Question 4 of 6: People**
 
-*Recommended:* **one Person, "Customer"** (browses, orders, pays, receives emails), **plus a separate "Shop Staff / Admin" Person** if anyone manages the catalog or orders through Web Shop itself. Each distinct role gets its own box rather than one generic "users" box.
+Who uses Web Shop? You mentioned **Customers**. Is anyone else? For example, staff or admins who manage products, orders, or refunds, maybe through an admin area of the same SPA or a separate back-office tool. Or support agents looking up orders.
+
+*My suggestion:* **Customer** plus a **Shop Administrator** (staff who manage the catalogue and orders), *if* such a role exists in the app. If staff only ever work in the Stripe dashboard or directly in the database, leave them out. A role that never touches Web Shop doesn't belong on its diagrams.
+
+Is it just Customers, or are there other roles?
 
 ### Turn 5
 
 **User:**
 
-> Just customers for now. On Stripe: the SPA uses Stripe Elements for card entry, and the API confirms the payment.
+> Just customers for now.
 
 **Skill:**
 
-Got it. **Customer** is the only Person. On the Container diagram, both the SPA (Stripe Elements card entry) and the API (payment confirmation) will have arrows to Stripe.
+The only person on the diagrams will be **Customer**.
 
-**Q5: External systems.** So far there are two: **Amazon SES** (email) and **Stripe** (payments). Is there anything else? Common ones:
-- **Sign-in:** your own login in the API, or an identity provider (Cognito, Auth0, Google sign-in)?
-- **Inbound webhooks:** does Stripe call back into your API (e.g. `payment_intent.succeeded`)?
-- **Anything else:** analytics, shipping/tax APIs, object storage for product images?
+**Question 5 of 6: External systems**
 
-*Recommended:* **SES + Stripe, with Stripe webhooks back into the API if you use them.** Leave out anything that's only monitoring or infrastructure. That belongs on a Deployment diagram.
+So far there are two: **Amazon SES** (email) and **Stripe** (payments). Two things to pin down:
+
+**a) How does Stripe connect?** The arrows depend on it. The usual setup:
+- the **SPA** loads Stripe.js / Elements so card details go from the browser straight to Stripe and never touch your API,
+- the **API** calls the Stripe API to create and confirm PaymentIntents,
+- **Stripe** sends **webhooks** back to the API (payment succeeded, failed, refunded).
+
+*My suggestion:* **all three arrows**, unless you use Stripe Checkout (a redirect to a Stripe-hosted page) or the API handles card data itself.
+
+**b) Anything else?** For example, a login provider (Auth0, Cognito, Google sign-in) or Spring Security with users stored in Postgres, analytics, a CDN or object storage for product images, or shipping or tax APIs. My guess is **nothing else, with login handled by the API and Postgres**. But anything left out here won't appear on the diagram.
 
 ### Turn 6
 
 **User:**
 
-> Login is our own, in the API. Yes, Stripe sends webhooks to the API. Nothing else.
+> Yes, all three Stripe arrows: the SPA uses Stripe Elements, the API confirms the payment, and Stripe sends webhooks to the API. Login is our own, in the API. Nothing else.
 
 **Skill:**
 
-The external systems are settled: **Amazon SES** and **Stripe**, with Stripe webhooks coming into the API. Login is built into the API, so there's no external identity provider.
+Here's the full set of connections:
+- **SPA → Stripe**: card details collected by Stripe Elements (HTTPS)
+- **API → Stripe**: confirms payments (HTTPS/JSON)
+- **Stripe → API**: payment-event webhooks (HTTPS)
+- **API → SES**: sends emails (SMTP)
+- Login is handled by the API, with users stored in Postgres, so there's no separate login system.
 
-**Q6: Which C4 levels.** This is the last question.
+**Question 6 of 6: Which C4 levels to draw now**
 
-*Recommended:* **System Context + Container now.** Context shows Customer → Web Shop → SES/Stripe, which is what a new engineer needs on day one. Container zooms into the SPA, the API, and Postgres, with the Stripe Elements and webhook arrows. Skip Component for now. If onboarding later needs the inside of the Spring Boot API (controllers, payment service, mailer), we can add that view to the same model.
+*My suggestion:* **System Context + Container**, both built from one model:
+- **System Context:** Customer, Web Shop as a single box, Stripe, and Amazon SES. This is the big picture a new hire sees on day one.
+- **Container:** inside Web Shop, the React SPA, the Spring Boot API, and the Postgres database, with each Stripe and SES connection attached to the container that actually makes it.
 
-Go with Context + Container?
+I'd **skip the Component level** (the inside of the API) for now. At onboarding it goes stale faster than it helps, and we can add it later if the API's internals need explaining. A **Deployment** diagram (where everything is hosted) is also optional; tell me if you want one and what it runs on.
+
+Shall I go ahead with System Context + Container?
 
 ### Turn 7
 
@@ -120,37 +152,33 @@ Go with Context + Container?
 
 **Skill:**
 
-I've drawn the System Context and Container diagrams for Web Shop. The model passes Structurizr's validation, and I opened both rendered images to check them.
+I've drawn both diagrams and checked them. Here's where they are:
 
-**Files** (in `docs/architecture/`):
-- `workspace.dsl`: the source for both diagrams.
-- `exports/SystemContext.png` / `.svg`: Web Shop with Customer, Stripe and Amazon SES around it.
-- `exports/Containers.png` / `.svg`: the React app, the Spring Boot API and Postgres inside Web Shop.
-- `exports/*-key.png` / `.svg`: a legend for each diagram.
+- **Model (single source of truth):** `docs/architecture/workspace.dsl`
+- **Images:** `docs/architecture/exports/SystemContext.png` and `Containers.png` (plus `.svg` versions and a `*-key` legend for each)
 
-**What the diagrams show**
-- **Customer** uses the React app in their browser.
-- **React app → API:** JSON over HTTPS.
-- **API → Postgres:** SQL over JDBC.
-- **Stripe:** card details go from the React app straight to Stripe through Stripe Elements. The API confirms the payment with Stripe, and Stripe sends webhooks back to the API.
-- **Amazon SES:** the API sends email through SES over SMTP, and SES delivers it to the Customer.
+**What I checked:**
+- **Validation:** the DSL parses cleanly.
+- **Lint:** the model lint flags only that Web Shop has no written docs or architecture decision records (ADRs) attached. That isn't a problem with the diagrams, so I left it.
+- **Contents:** System Context has 4 elements and 5 arrows. Containers has 6 elements and 8 arrows. Neither view is empty, and nothing extra got pulled in.
+- **Readability:** both images are under about 3000px wide, so labels stay readable in a README column (1387px and 2878px).
+- **Context diagram:** reads cleanly.
+- **Container diagram:** readable, but the three Stripe arrows all come into the same side of the Stripe box, so that corner is a bit busy. It's tolerable, and fixing it would mean hand-tuning the layout in `structurizr local`.
 
-**Two fixes during the check**
-- On the first Container render, the API → SES arrow ran straight through the Stripe box. I switched that diagram to a top-to-bottom layout, which fixed it.
-- I set the workspace scope and added a technology to the two edges that go to and from the Customer.
+**About the context view:** I declared one arrow, "Web Shop takes card payments through Stripe", directly at the system level. Without it, the context view would have shown whichever container-level Stripe arrow came first, such as "Sends card details to, via Stripe Elements", which is misleading at that level.
 
-**Still flagged:** Structurizr's model check still reports two items: no written documentation and no architecture decision records for Web Shop. Neither affects the diagrams.
+The review questions are next, one at a time.
 
----
+**Review question 1: Who serves the SPA?**
 
-Now some review questions about what the diagrams show. You can skip them by saying "skip the grill". One at a time, starting with the gap I'm least sure about:
+The React SPA has to be downloaded by the customer's browser from somewhere, and nothing on the diagram says where. A new engineer will wonder. Common answers:
+- **(a)** The Spring Boot API serves the built bundle as static resources. Then I'd add "API delivers the SPA to the browser" and no new box.
+- **(b)** A CDN or static host (S3 + CloudFront, Netlify, Vercel). That's usually hosting rather than a C4 container, so it belongs on a Deployment diagram, not these two.
+- **(c)** A separate web server container (nginx) that your team runs.
 
-**R1: How does the React app get to the customer's browser?** At the moment the Customer just "uses" the React app, and nothing serves it. A new engineer will ask where the HTML and JS bundle come from. The answer decides whether there's a fourth container:
+*My suggestion:* if it's **(a)**, add that one arrow. If it's **(b)**, leave both diagrams as they are and add a line to the SPA's description, e.g. "served as static files from CloudFront".
 
-- **(a)** Spring Boot serves the built bundle as static resources. No new box; I'd add "Serves the SPA" to the API's description.
-- **(b)** It's hosted separately, e.g. S3 + CloudFront or Nginx. That's a static-content container (or a note for a later Deployment diagram), with an arrow "Delivers the SPA to" the Customer's browser.
-
-*Recommended:* **(a), if that's how it works today.** It keeps the diagram at three containers and is the common Spring Boot setup. Which is it?
+Which is it?
 
 ### Turn 8
 
@@ -160,19 +188,24 @@ Now some review questions about what the diagrams show. You can skip them by say
 
 **Skill:**
 
-I updated the diagrams with your answer. The API Application box on the Container diagram now says it **serves the SPA bundle**, so there's still no fourth container. The model passed validation again and I re-rendered both diagrams. I looked at the new Container image: no arrows cross boxes and every label is readable.
+I've added the arrow and stopped the review there. Both diagrams are finished, and I re-rendered and checked them after the change.
 
-**Files** (all in `docs/architecture/`):
-- `workspace.dsl`: the source for both diagrams. Edit this, not the images.
-- `exports/SystemContext.png` / `.svg`: Customer, Web Shop, Stripe and Amazon SES.
-- `exports/Containers.png` / `.svg`: the React app, the Spring Boot API and Postgres, with the Stripe and SES connections.
-- `exports/*-key.png` / `.svg`: a legend for each diagram.
+**What changed:**
+- New arrow: **API Application → Single-Page Application**, "Delivers the SPA's static bundle to the customer's browser" `[HTTPS]`.
+- The API's description now starts "Serves the SPA bundle; …".
+- The context view is unchanged.
 
-For the repo, use the PNG or SVG files. Each image prints the time it was rendered, so every re-render changes the files even if the diagram didn't. Run `git checkout` on any you didn't mean to change before committing.
+**Checks after the change:** the DSL still parses. Context has 4 elements and 5 arrows; Containers now has 6 elements and 9 arrows. The container image is 2878px wide, still within the ~3000px that stays readable in a README. The new arrow and its label don't overlap anything else. The Stripe corner is still a little busy, as before, but readable.
 
-We stopped the review there, so these questions are still open:
-- **Sync or async:** Does the API send email inside the request, or through a background job or queue? If it's a queue, that's another box on the Container diagram.
-- **Webhook security:** Does the API check the signatures on Stripe's webhooks? This is worth writing down for new engineers, either on the diagram or in the docs.
-- **Docs and decisions:** Structurizr's model check still flags that Web Shop has no written docs and no architecture decision records. It doesn't affect the diagrams. Add them if you want the onboarding material in one place.
+**Files** (in `docs/architecture/`):
+- `workspace.dsl`: the model both diagrams are generated from; edit this, not the images.
+- `exports/SystemContext.png` / `.svg`: the System Context diagram, to read first.
+- `exports/Containers.png` / `.svg`: the Container diagram, the zoom into Web Shop.
+- `exports/*-key.png` / `.svg`: legends.
+- `exports/workspace.json`.
 
-To pick up later, re-run the export, or start `structurizr/structurizr local` and adjust the layout by hand at `http://localhost:8080`.
+**Loose ends:**
+- **Arrow labels:** the review questions I didn't get to would have gone through each arrow's wording. The labels are specific and point the right way, so this is optional.
+- **Lint:** it still flags that Web Shop has no written docs or ADRs attached. Adding a short `docs/` folder and decision records later would clear it, and it would fit an onboarding set well.
+- **Re-rendering:** each PNG carries a render timestamp, so every re-render changes every image even when nothing else did. Before committing, restore any image you didn't mean to change.
+- **Git:** nothing is committed. You're on `master`, and the main branch is `main`.
