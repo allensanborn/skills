@@ -1,0 +1,58 @@
+name: Release assets
+
+# When changesets pushes a version tag (release.yml), publish a GitHub Release with the
+# plugin archive and signed SLSA provenance (*.intoto.jsonl). Scorecard's
+# Signed-Releases check scores a release 10 when it carries provenance.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub Release
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Pack the plugin
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          mkdir dist
+          git archive --format=tar.gz --prefix="allensanborn-skills-${TAG}/" \
+            -o "dist/allensanborn-skills-${TAG}.tar.gz" HEAD -- .claude-plugin skills LICENSE README.md
+
+      - name: Hash the archive
+        id: hash
+        run: echo "hashes=$(cd dist && sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # This version's section of CHANGELOG.md, without its heading.
+          awk -v v="## ${TAG#v}" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md > notes.md
+          gh release create "$TAG" dist/* --verify-tag --title "$TAG" --notes-file notes.md
+
+  provenance:
+    needs: build
+    permissions:
+      actions: read # read the workflow run
+      id-token: write # sign the provenance with Sigstore
+      contents: write # upload it to the release
+    # The SLSA generator must be referenced by tag: it verifies its own ref. Scorecard's
+    # Pinned-Dependencies check only inspects steps, not job-level reusable workflows.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0 # zizmor: ignore[unpinned-uses]
+    with:
+      base64-subjects: ${{ needs.build.outputs.hashes }}
+      upload-assets: true
+      upload-tag-name: ${{ github.ref_name }}
