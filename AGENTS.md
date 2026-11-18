@@ -8,7 +8,7 @@ Skills are organized into bucket folders under `skills/`:
 
 Every skill in `engineering/` or `productivity/` (the **promoted** buckets) must have a reference in the top-level `README.md` and an entry in `.claude-plugin/plugin.json`'s `skills` array (the Claude Code plugin ships exactly the promoted set). Skills in `misc/`, `in-progress/`, and `deprecated/` must not appear in either. `ci/check.sh` fails if `plugin.json` drifts from disk.
 
-Install commands are copied verbatim from [.agents/install-block.md](./.agents/install-block.md). `.claude-plugin/marketplace.json` is the repo's own marketplace. Run `bash ci/check.sh` after touching either manifest: it runs `claude plugin validate` as strict, tolerating only the warning that root `CLAUDE.md` is not plugin context (mattpocock/skills hits the same one).
+The README's **Installation** section is the one install story: list only routes someone has actually run against this repo, and docs pages carry no install commands. `.claude-plugin/marketplace.json` is the repo's own marketplace. Run `bash ci/check.sh` after touching either manifest: it runs `claude plugin validate` as strict, tolerating only the warning that root `CLAUDE.md` is not plugin context (mattpocock/skills hits the same one).
 
 Each skill entry in the top-level `README.md` must link the skill name to its `SKILL.md`.
 
@@ -24,15 +24,13 @@ Decisions that shape a skill or the repo are recorded as ADRs in [.agents/adr/](
 
 Research notes are throwaway: write them to `.scratch/` (gitignored) and record conclusions in the bead's notes. Before the bead closes, fold anything durable into a skill's `references/`, a docs page, or an ADR; never commit a standalone research file, because a dated note goes stale silently.
 
-Every skill keeps its evals in `evals/` (an `evals.json` plus one `<skill>-<n>/` case folder per eval). Add or update a case when you change behaviour the evals cover.
+Every skill keeps its evals in `evals/`, one `<skill>-<n>/` case folder per eval (`prompt.md`, `case.yaml`, `graders/`), run by `claude plugin eval` (see CONTRIBUTING.md). Add or update a case when you change behaviour the evals cover.
 
 To (re)link every skill outside `deprecated/` and `misc/` into the local harness skill directories (`~/.claude/skills`, `~/.agents/skills`), run `scripts/link-skills.sh`. Each entry is a symlink into this repo, so a `git pull` keeps installed skills current; re-run the script after adding, removing, or renaming a skill.
 
 No em-dashes anywhere in this repo's prose (`SKILL.md` files, references, evals, docs, `README.md`, `CHANGELOG.md`, ADRs, changesets, code comments). Where a sentence reaches for one, rewrite it instead with a comma, colon, period, parentheses, or a conjunction, whichever the sentence actually wants; never do a blind character substitution. Vale enforces this (`dagger call vale --source=.`).
 
 Every skill that dispatches a subagent says to start it with a fresh context window. Some harnesses (Codex, for one) fork the parent conversation by default, and a fork inherits the parent's context, which is what the subagent was meant to escape.
-
-`AGENTS.md` is a byte-identical copy of this file. Edit both, or `ci/check.sh` fails.
 
 ## Agent skills
 

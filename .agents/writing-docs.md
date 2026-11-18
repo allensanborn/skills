@@ -18,7 +18,7 @@ Fill the template below, keeping its order. The **fixed frame** (`## What it doe
 
 Four sections make a page worth reading: `What it does`, `When to reach for it`, `Common questions`, `It's working if`. Treat a page that has neither of the last two as unfinished, not as finished-and-short.
 
-**A page carries no install commands.** Install wording lives in [the install block](./install-block.md) and the top-level `README.md`.
+**A page carries no install commands.** Install wording lives in the top-level `README.md` only.
 
 <page-template>
 
