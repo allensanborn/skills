@@ -13,11 +13,14 @@ each output. Audience: skill maintainers. Source of truth: [workspace.dsl](works
 Re-render (SVGs carry a timestamp footer, so every render changes them; delete the `*-key.svg` legends afterwards):
 
 ```bash
+IMG=$(sed -nE 's/^IMG=([^ ]+@sha256:[0-9a-f]{64})$/\1/p' skills/engineering/drawing-c4-diagrams/SKILL.md)
 cd docs/architecture
 docker run --rm --ipc=host -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
-  -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright \
-  export -workspace workspace.dsl -format svg -output exports
+  -v "$PWD:/work" -w /work "$IMG" export -workspace workspace.dsl -format svg -output exports
 ```
+
+Run it from the repo root: the image comes from the skill's "Pinned images", so a Renovate bump
+re-renders these with the same image the skill uses.
 
 ## Icon licensing (not legal advice; checked 2026-11-14 to 2026-11-16)
 

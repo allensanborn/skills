@@ -124,7 +124,11 @@ the review, not optional.
       2. **Try the other direction.** `tb` is usually narrower than `lr`, especially for deeply
          nested deployment nodes; measure both if the first is still over.
       3. **Split the view** (see [patterns](patterns-and-pitfalls.md#modeling-patterns-common-use-cases)).
-         Past about **12-15 elements** this is usually the only fix.
+         Past about **8 elements** for a README this is usually the only fix: with tight `tb`
+         spacing, 6 elements measured 2878 px and 13 measured 3676 px (v2026.10.26).
+      **Can't measure** (no Docker, or the render failed)? Don't stop at step 1 and hope: count the
+      elements and apply the same rule, split above about 8 for a README, and say the width is
+      unmeasured.
 - [ ] **Styling survives the export**: Do the ownership colours, shapes, borders, and legend
       render as intended in the format you're shipping? PlantUML and Mermaid style differently,
       and a generated workspace has **no theme** unless you add one.
