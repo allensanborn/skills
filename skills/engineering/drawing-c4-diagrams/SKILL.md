@@ -132,7 +132,7 @@ back to disk. Skip this entirely at Tier 0/1.
 
 Review has **two passes**, both driven by [references/diagram-review-checklist.md](references/diagram-review-checklist.md):
 
-1. **Render and look** (not optional): actually render the views (PNG/SVG or the live server)
+1. **Render and look** (not optional): actually render the views (PNG, which you can view, or the live server)
    and eyeball them against the *Render and look* checklist. DSL validation passes on diagrams
    that are visually broken: empty views, a view that pulled in the whole landscape, hairballs,
    overlapping boxes, orphans. These are invisible in the source. Judge legibility at the size
@@ -150,8 +150,11 @@ export, even when the grill is skipped. Both default on.
 Finally, export the finished views into `<configured-dir>/exports/` and tell the user where
 they are: Mermaid/PlantUML via MCP, PNG/SVG by adjusting layout in `local`, or **headlessly via
 Structurizr's own PNG/SVG export** (needs the `<release>-playwright` image tag; the default tag can't do it;
-recipe in [references/runtime-and-mcp.md](references/runtime-and-mcp.md); PlantUML → PNG/SVG is the fallback). For diagrams committed to a
-repo, prefer PNG/SVG: Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
+recipe in [references/runtime-and-mcp.md](references/runtime-and-mcp.md); PlantUML → PNG/SVG is the fallback). Render **PNG to look at and
+measure** (you can view a PNG, not an SVG), but **commit SVG**: about 10x smaller, it renders on
+GitHub, stays sharp when zoomed, and keeps installed-theme icons embedded. Commit PNG instead only
+where SVG won't display (slides, chat, email), and never commit both. Don't commit Mermaid:
+Structurizr's Mermaid uses HTML labels that render poorly on GitHub.
 
 ## References
 

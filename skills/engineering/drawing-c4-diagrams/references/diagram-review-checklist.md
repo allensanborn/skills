@@ -112,7 +112,7 @@ the review, not optional.
       names and relationship labels at 24 px, so labels shrink to `24 × target ÷ image width`
       px, and below about 7 px they can't be read. That puts the **image width budget at about
       3.4× the target**: roughly **3000 px for a README**, 6500 px for a slide. Read the width
-      from the export (`file exports/<key>.png`, or the SVG's `width`), and if a resize tool is
+      from the export (`file exports/<key>.png`; an SVG's `width` attribute is the same number), and if a resize tool is
       available (`sips --resampleWidth 880`, ImageMagick) look at the shrunk copy too.
       Over budget, fix it before showing the user; don't just offer to. In this order:
       1. **Tighten the spacing.** Arrows' labels between two rows sit side by side in that gap,

@@ -4,4 +4,4 @@ focus: trace
 weight: 1
 ---
 
-Prefers PNG/SVG over Mermaid for repo-committed images (Structurizr Mermaid uses HTML labels that render poorly on GitHub)
+Commits SVG for repo images (PNG only where SVG won't display), not Mermaid (Structurizr Mermaid uses HTML labels that render poorly on GitHub)

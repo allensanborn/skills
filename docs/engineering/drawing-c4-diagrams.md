@@ -67,9 +67,9 @@ Parsing proves syntax, not content. A mis-scoped `include` or `exclude` renders 
 
 Yes to drawing them: Structurizr bundles AWS, Azure, GCP, OCI, and Kubernetes themes, and the skill tags each infrastructure node to pick them up. Publishing is murkier. Only Kubernetes grants an actual licence, and the AWS and Oracle site terms restrict redistribution, so this repo ships no icon files. See the [icon licensing notes](https://github.com/allensanborn/skills/blob/main/docs/architecture/README.md#icon-licensing-not-legal-advice-checked-2026-11-14-to-2026-11-16).
 
-**Why PNG or SVG instead of Mermaid in my repo?**
+**Which image format ends up in my repo?**
 
-Structurizr's Mermaid export uses HTML labels that render poorly on GitHub. Mermaid is fine as a quick in-chat preview; commit PNG or SVG.
+SVG. It is about a tenth the size of the PNG, renders on GitHub, stays sharp when you zoom, and keeps cloud icons embedded. The skill still renders PNG to check each diagram, and commits PNG instead only where SVG won't display, such as slides, chat or email. Mermaid is fine as a quick in-chat preview but renders poorly on GitHub, so it isn't committed.
 
 ## It's working if
 
