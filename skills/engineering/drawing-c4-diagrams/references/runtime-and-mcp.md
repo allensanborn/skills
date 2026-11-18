@@ -223,15 +223,9 @@ Notes:
   So set `structurizr.license`, use the **14-day trial at trial.structurizr.com**, or build the
   open core from source. Tell the user up front, before they mount a data directory. For the multi-workspace / enterprise landscape-generation pipeline see
   [multi-system-and-enterprise.md](multi-system-and-enterprise.md).
-- **`filtered` views and `perspectives` don't survive the text exports.** The PlantUML and Mermaid
-  exports silently skip `filtered` views (only the base view is written), and a filtered view
-  rejects `autolayout` on its base (*"automatic layout ... is not supported for filtered views"*).
-  The PNG/SVG export does the opposite: it writes the filtered view and **skips its base** (verified
-  on `2026.10.26-playwright`, 2026-11-18). `perspectives` are an interactive-only overlay in the
-  Structurizr UI (the binoculars / `p` key), invisible in every export. So if you need "clean" and "full" variants of a diagram in
-  **committed images**, author them as **two explicit views** (e.g. one `include *`, one that
-  `exclude`s the platform tag), not one base + a filtered derivative. Both are fine when the
-  audience browses the live Structurizr server instead.
+- **`filtered` views and `perspectives`**: no headless export writes both a filtered view and its
+  base, and none draws perspectives. Author explicit views instead; see
+  [structurizr-dsl.md](structurizr-dsl.md) (*Filtered views*).
 
 ### PNG and SVG with Structurizr's own layout (preferred)
 
@@ -268,10 +262,6 @@ Gotchas (all hit for real):
   still reports success.
 - **Each image (PNG or SVG) carries a render-time footer**, so every re-render changes every image even when the
   model did not. Restore unchanged images (`git checkout`) before committing, or accept the noise.
-- **`filtered` views export, but their base doesn't.** The base can't have `autolayout` ("not
-  supported for filtered views"); without it the renderer still lays out the filtered view, but
-  the base view is not written at all. Perspectives never appear. To ship both a "full" and a
-  "clean" image, author two explicit views instead (verified 2026-11-18).
 - Verified on `2026.10.26-playwright` (2026-11-13), including an AWS-themed deployment view whose
   icons render in the PNG, the SVG (base64-embedded) and the key. The earlier build-from-source
   recipe (Maven stage + `mcr.microsoft.com/playwright/java`) is only needed for an unreleased

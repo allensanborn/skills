@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: drawing-c4-diagrams-14
+expected_outcome: |
+  Checks legibility against the README budget (about 880 px of display, so an image no wider than about 3000 px): measures the rendered width, or, since Docker is blocked inside the `claude plugin eval` sandbox, judges it from the view (13 elements, many datastore and bus edges, `autolayout lr`) and says plainly that it could not measure
+  Fixes the structure instead of hand-tuning or widening spacing: the views meant for the README split the container view by role into focused views (for example a request path with the datastores excluded, plus a data view for the services and the stores they own), each saying where the rest of the system is, with no element left disconnected in its view (keeping the original all-in-one view for browsing in the live server is fine)
+  Lays the views meant for the README out top to bottom (`autolayout tb`, tight spacing such as `tb 200 50` is fine), not `lr`

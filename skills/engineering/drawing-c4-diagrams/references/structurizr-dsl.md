@@ -223,12 +223,13 @@ from a base by tag. Two hard limits make them a poor fit for committed images:
 
 - the **base view must use manual layout**: `autolayout` on a filtered view's base is rejected;
 - **headless export writes only one of the pair**: PlantUML/Mermaid write the base and skip the
-  filtered view, PNG/SVG write the filtered view and skip the base
-  ([runtime-and-mcp.md](runtime-and-mcp.md)).
+  filtered view, PNG/SVG write the filtered view and skip the base (verified on
+  `2026.10.26-playwright`, 2026-11-18).
 
 So for repo images, author a "clean" and a "full" view **explicitly** (one `include *`, one that
 `exclude`s the noisy tag/element). Filtered views are fine only when the audience browses the
-live Structurizr server.
+live Structurizr server. **Perspectives** are the same story: an overlay in the Structurizr UI (the
+binoculars / `p` key) that no export draws.
 
 **Layout.** `autolayout <tb|bt|lr|rl> [rankSep] [nodeSep]`. **Default to `tb`**: diagrams should
 grow taller, never wider, because a viewer shrinks a wide image to fit and the labels go with it,

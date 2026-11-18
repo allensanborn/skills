@@ -4,6 +4,5 @@ expected_outcome: |
   Assesses image complexity and asks whether the user wants one-pass or a grilled conversion
   For a simple image, offers one-pass; for a complex one, strongly encourages the grill
   Runs the interpretation grill and rejects silent Docker-container-vs-C4-container / infra-vs-software-system mis-mapping
-  Builds the model one C4 level at a time
 context:
   scaffold_script: scaffold.sh

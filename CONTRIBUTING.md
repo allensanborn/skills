@@ -98,7 +98,8 @@ Keep results **outside** the skill folder: reports quote the eval agent's system
 skill-lint flags as TOXIC, and a packaged skill would ship them. `--allow-tools` is needed for
 cases that render; `allowed_tools` in a case's `prompt.md` doesn't grant them by itself.
 `--scaffold` runs the `scaffold.sh` in cases 2 and 10, which copies their input file into the
-empty workspace. Docker is blocked inside the eval sandbox, so render graders accept an honest
+empty workspace. Case 15 resumes a saved conversation (`history.jsonl`, trimmed to the prompt and
+reply with no personal data); the runner leaves a session `.jsonl` beside it, which is gitignored. Docker is blocked inside the eval sandbox, so render graders accept an honest
 "couldn't render"; the rendering itself is tested by `dagger call render-test`.
 
 ## Image bumps (Renovate)
