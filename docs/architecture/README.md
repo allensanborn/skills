@@ -5,18 +5,18 @@ each output. Audience: skill maintainers. Source of truth: [workspace.dsl](works
 
 | View | Shows |
 | --- | --- |
-| [Context](exports/Context.png) | Engineer, the toolchain, Docker Hub, GitHub raw, the dead theme host, icon owners |
-| [Containers](exports/Containers.png) | Claude, the skill, workspace.dsl, the Structurizr/PlantUML/Mermaid containers, exports |
-| [IconFlow](exports/IconFlow.png) | Installed theme vs URL theme, and what each export format keeps (from `evals/render/test.sh`) |
-| [Deployment](exports/Deployment.png) | The Mac, OrbStack, one Docker container per tool, the internet |
+| [Context](exports/Context.svg) | Engineer, the toolchain, Docker Hub, GitHub raw, the dead theme host, icon owners |
+| [Containers](exports/Containers.svg) | Claude, the skill, workspace.dsl, the Structurizr/PlantUML/Mermaid containers, exports |
+| [IconFlow](exports/IconFlow.svg) | Installed theme vs URL theme, and what each export format keeps (from `evals/render/test.sh`) |
+| [Deployment](exports/Deployment.svg) | The Mac, OrbStack, one Docker container per tool, the internet |
 
-Re-render (PNGs carry a timestamp footer, so every render changes them):
+Re-render (SVGs carry a timestamp footer, so every render changes them; delete the `*-key.svg` legends afterwards):
 
 ```bash
 cd docs/architecture
 docker run --rm --ipc=host -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
   -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright \
-  export -workspace workspace.dsl -format png -output exports
+  export -workspace workspace.dsl -format svg -output exports
 ```
 
 ## Icon licensing (not legal advice; checked 2026-11-14 to 2026-11-16)

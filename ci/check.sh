@@ -7,9 +7,6 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-echo "==> AGENTS.md is a copy of CLAUDE.md"
-cmp CLAUDE.md AGENTS.md
-
 echo "==> plugin manifest lists exactly the shipped skills"
 # Shipped = every SKILL.md outside in-progress/, personal/, misc/, deprecated/.
 shipped="$(find skills -name SKILL.md \

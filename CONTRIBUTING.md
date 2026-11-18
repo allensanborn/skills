@@ -35,7 +35,7 @@ Every change reaches `main` through a pull request whose six CI checks pass. A r
 | The PR changes | Check |
 | --- | --- |
 | A skill's behaviour (`SKILL.md`, `references/`) | An eval case covers it (added or updated), the docs page in `docs/<bucket>/` still matches, and there's a changeset. Every constraint in the old wording ("hard to skip", tier numbers, command names) survives the new one. |
-| A skill's evals | `evals.json`, each `case.yaml`, and the `graders/` bodies say the same thing; graders check behaviour, not wording. |
+| A skill's evals | Each case's `case.yaml` expected outcome and its `graders/` bodies say the same thing; graders check behaviour, not wording. |
 | Samples (`docs/examples/`) | They are real, unedited runs: the README names the commit and flags, and any edit to model output is disclosed. |
 | Workflows (`.github/`) | Actions are pinned to a commit SHA with the version in a comment; permissions are the least the job needs; any `zizmor: ignore` says why. |
 | Prose anywhere | Plain words, no em-dashes (Vale enforces it), links resolve. |
@@ -62,7 +62,7 @@ third-person "pushy" descriptions, forward-slash paths, evals-first.
 
 Quality checks run in containers via [Dagger](https://dagger.io), so they behave the same locally and
 in CI. `.github/workflows/ci.yml` runs every one of them on each pull request and on `main`; see
-[`.dagger/`](.dagger/) for the functions and [SECURITY.md](./SECURITY.md) for what else guards the repo.
+[`.dagger/src/index.ts`](.dagger/src/index.ts) for the functions and [SECURITY.md](./SECURITY.md) for what else guards the repo.
 
 ```bash
 # via Dagger: lint, prose lint, and the drawing-c4-diagrams render test (Docker + network)
@@ -73,9 +73,27 @@ dagger call gitleaks --source=.       # secrets in the working tree
 dagger call zizmor --source=.         # security lint of .github/workflows
 dagger call render-test --source=.
 
-# local: AGENTS/CLAUDE parity, plugin manifest + validate, version sync, skill-lint, links
+# local: plugin manifest + validate, version sync, skill-lint, links
 bash ci/check.sh
 ```
+
+`render-test` renders `evals/render/aws-deployment.dsl` through every export path and runs
+`evals/render/test.sh --check` on the output; the image and theme pins are mirrored in
+`test.sh` and `.dagger/src/index.ts`, so bump them together. Without Dagger, run `test.sh`
+directly (plain Docker).
+
+LLM evals run with Claude Code's own runner, with-skill against a no-skill baseline and an LLM
+judge. These are real, billed runs:
+
+```bash
+claude plugin eval skills/engineering/drawing-c4-diagrams --no-publish --allow-tools Bash Write Edit \
+  --output-dir /tmp/c4-evals --report /tmp/c4-evals/report.html \
+  [--case drawing-c4-diagrams-13] [--runs 1] [--max-cost-usd 5]
+```
+
+Keep results **outside** the skill folder: reports quote the eval agent's system prompt, which
+skill-lint flags as TOXIC, and a packaged skill would ship them. `--allow-tools` is needed for
+cases that render; `allowed_tools` in a case's `prompt.md` doesn't grant them by itself.
 
 ## Release app
 
@@ -95,51 +113,17 @@ The workflow asks for a token scoped to contents and pull requests only, which e
 
 ## Issue tracking (beads)
 
-Issues live in a local Dolt database and travel on **`refs/dolt/data`** on this repo's git
-remote, **not** in git objects. A plain `git clone` does not fetch them, and a plain
-`git push` does not send them.
-
-**On a fresh clone, or a new machine, run both:**
+Issues live in a Dolt database that travels on **`refs/dolt/data`** on this repo's remote, not
+in git objects: a plain `git clone` doesn't fetch them and a plain `git push` doesn't send
+them. On a fresh clone or a new machine, run both:
 
 ```bash
 bd bootstrap                              # fetches the issue database
-git config core.hooksPath .beads/hooks    # makes the tracked hooks actually fire
+git config core.hooksPath .beads/hooks    # makes the tracked hooks fire, so pushes sync issues
 ```
 
-Neither implies the other. `bd bootstrap` gets the data; the `git config` is what makes
-`git push` carry your subsequent issue changes. The hooks themselves live in
-`.beads/hooks/` and **are tracked**, so you never need `pre-commit install` here, but
-`core.hooksPath` is git config, which cannot be committed, so that one line is manual per
-clone.
-
-Do **not** run `bd hooks install`. It reports success, does not set `core.hooksPath`, and
-rewrites `.git/hooks` with a version that has no `bd dolt push` in it.
-
-**Verify rather than assume.** This repo was found on 2026-08-22 with hooks completely
-dead and no local database, while 7 real issues sat unreachable on the remote:
-
-```bash
-if [ -n "$(git config --get core.hooksPath)" ] || [ -f .git/hooks/pre-push ]
-then echo "hooks OK"; else echo "HOOKS DEAD: run git config core.hooksPath .beads/hooks"; fi
-bd list >/dev/null 2>&1 && echo "db OK" || echo "NO DATABASE: run bd bootstrap"
-```
-
-Or just run the packaged version, which also checks the Dolt remote, `beads.role`, `.beads`
-permissions and unpushed commits, and exits non-zero if anything is wrong:
-
-```bash
-./ci/beads-audit.sh
-```
-
-A green `git push` proves nothing on its own. To confirm sync end to end, make a real issue
-change and watch the ref move. Note that a push with no issue changes correctly leaves it
-untouched:
-
-```bash
-git ls-remote origin refs/dolt/data   # before
-git push                              # prints "pre-push: syncing issues..."
-git ls-remote origin refs/dolt/data   # must differ
-```
-
-Full background, including the pre-commit/linter variant used in other repos:
+Do **not** run `bd hooks install`: it reports success but doesn't set `core.hooksPath`, and it
+rewrites `.git/hooks` without the `bd dolt push` step. To check everything (hooks, database,
+Dolt remote, permissions, unpushed commits), run `./ci/beads-audit.sh`; it exits non-zero on any
+problem. The full procedure is in
 [`BEADS-PROCEDURE.md`](https://github.com/allensanborn/beads-roundtrip-probe/blob/main/BEADS-PROCEDURE.md).

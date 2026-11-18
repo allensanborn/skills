@@ -9,6 +9,6 @@
     "MD033": { "allowed_elements": ["details", "summary", "canonical-block", "page-template"] }
   },
   // docs/examples/: model-written files are kept verbatim; the sample READMEs are still linted.
-  "ignores": ["node_modules/**", ".beads/**", ".dagger/**", "CHANGELOG.md", ".changeset/README.md",
+  "ignores": ["node_modules/**", ".beads/**", ".dagger/**", "CHANGELOG.md",
     "docs/examples/**/docs/**", "docs/examples/**/adrs/**", "docs/examples/**/VIEWS.md"]
 }

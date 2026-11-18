@@ -15,7 +15,7 @@ What tooling the current environment has, probed bottom-up: Tier 0 (no tools), T
 Rendering a view to an image and actually inspecting it before showing it to the user. Validation proves the DSL parses; render-and-look catches visual defects (empty views, overlapping elements, missing icons). Never skipped, including under "skip the grill".
 
 **Eval case**:
-One folder `evals/<skill>-<n>/` holding `prompt.md`, `case.yaml`, and `graders/`, mirrored by an entry in `evals/evals.json`.
+One folder `evals/<skill>-<n>/` holding `prompt.md`, `case.yaml`, and `graders/`.
 
 **Promoted**:
 A skill in `engineering/` or `productivity/`: listed in the README and `plugin.json`, and given a docs page.
