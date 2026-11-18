@@ -101,6 +101,12 @@ cases that render; `allowed_tools` in a case's `prompt.md` doesn't grant them by
 empty workspace. Docker is blocked inside the eval sandbox, so render graders accept an honest
 "couldn't render"; the rendering itself is tested by `dagger call render-test`.
 
+## Image bumps (Renovate)
+
+Each Docker image the skill runs is defined once, as an `*_IMG=image:tag@sha256:digest` line: three in `SKILL.md` ("Pinned images") and `MERMAID_IMG` in `evals/render/test.sh`. Everything else, including the Dagger module, reads those lines, and `ci/check.sh` fails on a version anywhere else. [Renovate](https://docs.renovatebot.com) watches only those lines (`renovate.json`); Dependabot keeps actions and npm. A bump PR arrives a week after an upstream release and is merged once `render-test` passes; add a patch changeset to it, since it changes what the skill runs.
+
+One-time setup, by the repo owner: install the [Renovate app](https://github.com/apps/renovate) on `allensanborn/skills` only.
+
 ## Release app
 
 Releases are cut by `.github/workflows/release.yml` (changesets). It opens the "chore: version skills" pull request with a GitHub App token, because a pull request opened with the default `GITHUB_TOKEN` triggers no workflows, so it would never get the CI checks that `main` requires. One-time setup, by the repo owner:

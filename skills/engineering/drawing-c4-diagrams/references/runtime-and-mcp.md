@@ -42,7 +42,7 @@ because Docker is there.
 > local run instead. Full subcommand set: `playground`, `local`, `server`, `export`, `push`,
 > `pull`, `branches`, `create`, `delete`, `lock`, `unlock`, `merge`, `validate`, `inspect`,
 > `list`, `generate`, `regenerate-apikey`. To confirm against the installed build rather than
-> this list, run **`docker run -it --rm structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 help`**.
+> this list, run **`docker run -it --rm "$IMG" help`**.
 >
 > Everything is now one Spring Boot app with embedded Tomcat (Java 21), so the `.war` is
 > interchangeable with the image: `java -jar structurizr.war <subcommand>` takes the same
@@ -66,9 +66,9 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
 
 1. Probe: is `docker` on PATH? Is a browser available? Is an MCP server reachable?
 2. Ask the user which tier they want. **Prefer Docker** when offering to install tooling:
-   - Tier 1 → `docker pull structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1` (the tested release, and
+   - Tier 1 → `docker pull "$IMG"` (the tested release, and
      the only variant that can export PNG/SVG; see below)
-   - Tier 2 → also `docker pull structurizr/mcp:2026.04.20@sha256:fc4ef98b7da925d62b08c71a90eb995a527fae30e2c04b39e3041f253c135539` (MCP is still a **separate image**)
+   - Tier 2 → also `docker pull "$MCP_IMG"` (MCP is still a **separate image**)
 3. Ask where diagrams should live (default `docs/architecture/`).
 4. Ask whether the post-generation review grill is on (default: on).
 5. Confirm MCP privacy: local Docker (default) vs public `mcp.structurizr.com` (opt-in).
@@ -96,8 +96,8 @@ Run when `.c4-diagrams.json` is absent (or a declared tool has gone missing):
 Run the server (local Docker, privacy-preserving default):
 
 ```bash
-docker pull structurizr/mcp:2026.04.20@sha256:fc4ef98b7da925d62b08c71a90eb995a527fae30e2c04b39e3041f253c135539
-docker run -it --rm -p 3000:3000 -e PORT=3000 structurizr/mcp:2026.04.20@sha256:fc4ef98b7da925d62b08c71a90eb995a527fae30e2c04b39e3041f253c135539 -dsl -mermaid -plantuml
+docker pull "$MCP_IMG"
+docker run -it --rm -p 3000:3000 -e PORT=3000 "$MCP_IMG" -dsl -mermaid -plantuml
 ```
 
 Client config (Claude Desktop can't do raw http; bridge with mcp-remote):
@@ -129,7 +129,7 @@ Render the real diagrams and let the user adjust layout:
 docker run -it --rm -p 8080:8080 \
   -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
   -v "$(pwd)/docs/architecture:/usr/local/structurizr" \
-  structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 local
+  "$IMG" local
 ```
 
 - **Keep `-e STRUCTURIZR_THEMES=…`.** Without it `local` looks for themes in
@@ -164,19 +164,19 @@ cd docs/architecture   # the dir holding workspace.dsl
 # 0. validate the DSL (the purpose-built check); do this before exporting.
 #    Keep STRUCTURIZR_THEMES on every command: without it a workspace using an installed theme
 #    (e.g. amazon-web-services-2025.07) fails to parse ("Theme ... does not exist").
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work "$IMG" \
   validate -workspace workspace.dsl
 
 # 1. (fallback path) DSL -> Mermaid and PlantUML (parsing the DSL here also validates it)
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work "$IMG" \
   export -workspace workspace.dsl -format mermaid  -output exports
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work "$IMG" \
   export -workspace workspace.dsl -format plantuml -output exports
 
 # 2. PlantUML -> PNG + SVG (rasterise; needs no network)
 cd exports
-docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml:1.2026.10@sha256:2cf2f097652701319e29b9e6a809e68d4ddb06fbeeb696705c097da8fa6d0507 -tpng "structurizr-*.puml"
-docker run --rm -v "$PWD:/data" -w /data plantuml/plantuml:1.2026.10@sha256:2cf2f097652701319e29b9e6a809e68d4ddb06fbeeb696705c097da8fa6d0507 -tsvg "structurizr-*.puml"
+docker run --rm -v "$PWD:/data" -w /data "$PLANTUML_IMG" -tpng "structurizr-*.puml"
+docker run --rm -v "$PWD:/data" -w /data "$PLANTUML_IMG" -tsvg "structurizr-*.puml"
 ```
 
 Notes:
@@ -242,9 +242,9 @@ Structurizr publishes an official **`<release>-playwright`** tag (Microsoft's Pl
 the same war + the bundled themes) that can. Pin the release:
 
 ```bash
-img=structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1   # the tested release (see SKILL.md, Pinned images)
+IMG=…   # the IMG line from SKILL.md, Pinned images
 run() { docker run --rm --ipc=host -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes \
-          -v "$PWD:/work" -w /work "$img" "$@"; }
+          -v "$PWD:/work" -w /work "$IMG" "$@"; }
 cd docs/architecture
 run validate -workspace workspace.dsl
 run export -workspace workspace.dsl -format png -output exports   # to look at and measure
@@ -315,5 +315,5 @@ With Docker, the same playground runs **locally**: worth offering when the DSL i
 you'd rather it never left the machine:
 
 ```bash
-docker run -it --rm -p 8080:8080 structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 playground
+docker run -it --rm -p 8080:8080 "$IMG" playground
 ```

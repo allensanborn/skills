@@ -2,4 +2,4 @@
 "allensanborn-skills": patch
 ---
 
-drawing-c4-diagrams: images are pinned by digest as well as tag; the validate command the skill hands you is the exact pinned one; parse errors are explained as the modeling mistake behind them; corrected which headless exports write filtered views (PNG/SVG write the filtered view and skip its base).
+drawing-c4-diagrams: each Docker image is pinned once, by tag and digest, in SKILL.md's "Pinned images"; every command uses `$IMG`, `$MCP_IMG` or `$PLANTUML_IMG`. Parse errors are explained as the modeling mistake behind them, and the references now say correctly which headless exports write filtered views (PNG/SVG write the filtered view and skip its base).

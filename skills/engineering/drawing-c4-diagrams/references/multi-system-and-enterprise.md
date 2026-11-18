@@ -98,7 +98,7 @@ The landscape is **generated**, never hand-authored; that's the point of decentr
 
 ```bash
 # 1. merge per-system workspaces; DERIVE system→system edges from each team's container edges
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work "$IMG" \
   generate system-landscape -i /work -o /work/landscape/_generated.json \
   -exclude 'workspace\.json' -relationships first
 
@@ -107,7 +107,7 @@ docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/wo
 #     list the system ids you want, e.g. exclude the Platform systems for the clean view)
 
 # 3. render
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work "$IMG" \
   export -workspace landscape/workspace.json -format plantuml -output landscape/exports
 ```
 

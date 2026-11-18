@@ -13,18 +13,20 @@
  */
 import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 
-// Mirrors the pins in skills/engineering/drawing-c4-diagrams/evals/render/test.sh; bump both together.
-const STRUCTURIZR = "structurizr/structurizr:2026.10.26-playwright"
-const PLANTUML = "plantuml/plantuml:1.2026.10"
-const MERMAID = "minlag/mermaid-cli:12.0.0"
-const THEME_URL =
-  "https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json"
+// Image versions live once, in SKILL.md ("Pinned images") and test.sh (MERMAID_IMG); read them from
+// the source so a Renovate bump changes one line.
+const SKILL = "skills/engineering/drawing-c4-diagrams"
+async function pin(source: Directory, file: string, name: string): Promise<string> {
+  const m = (await source.file(file).contents()).match(new RegExp(`^${name}=(\\S+)$`, "m"))
+  if (!m) throw new Error(`${name}= not found in ${file}`)
+  return m[1]
+}
 const MARKDOWNLINT = "davidanson/markdownlint-cli2:v0.24.0"
 const VALE = "jdkato/vale:v3.25.0"
 const GITLEAKS = "zricethezav/gitleaks:v8.30.1"
 const ZIZMOR = "1.32.0"
 const SKILL_SCANNER = "2.3.2"
-const RENDER = "skills/engineering/drawing-c4-diagrams/evals/render"
+const RENDER = `${SKILL}/evals/render`
 
 @object()
 export class Skills {
@@ -118,6 +120,11 @@ export class Skills {
    */
   @func()
   async renderTest(source: Directory): Promise<string> {
+    const STRUCTURIZR = await pin(source, `${SKILL}/SKILL.md`, "IMG")
+    const PLANTUML = await pin(source, `${SKILL}/SKILL.md`, "PLANTUML_IMG")
+    const MERMAID = await pin(source, `${RENDER}/test.sh`, "MERMAID_IMG")
+    const tag = STRUCTURIZR.split(":")[1].split(/[-@]/)[0]
+    const THEME_URL = `https://raw.githubusercontent.com/structurizr/structurizr/v${tag}/structurizr-themes/amazon-web-services-2025.07/theme.json`
     const fixture = await source.file(`${RENDER}/aws-deployment.dsl`).contents()
     const work = dag
       .directory()

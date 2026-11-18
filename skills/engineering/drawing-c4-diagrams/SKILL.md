@@ -44,13 +44,17 @@ tool is installed.
 > `server` subcommands. The **cloud service is end-of-life with no replacement**; never point a
 > user at it. See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for the full map.
 
-**Pinned images.** Run exactly these references, tag and digest, never a bare name or `latest`:
-the digest makes Docker refuse anything but the image this skill was tested against
-(`evals/render/test.sh`), even if upstream re-pushes the tag.
+**Pinned images.** This block is the only place image versions live. Every command in this skill
+and its references runs `"$IMG"`, `"$MCP_IMG"` or `"$PLANTUML_IMG"`, never a bare image name or
+`latest`. Each tool call is a fresh shell, so start every command with the line it needs, and
+include that line in any command you give the user. The digest makes Docker refuse anything but the
+image the render test (`evals/render/test.sh`) ran.
 
-- `structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1`
-- `structurizr/mcp:2026.04.20@sha256:fc4ef98b7da925d62b08c71a90eb995a527fae30e2c04b39e3041f253c135539`
-- `plantuml/plantuml:1.2026.10@sha256:2cf2f097652701319e29b9e6a809e68d4ddb06fbeeb696705c097da8fa6d0507`
+```bash
+IMG=structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1
+MCP_IMG=structurizr/mcp:2026.04.20@sha256:fc4ef98b7da925d62b08c71a90eb995a527fae30e2c04b39e3041f253c135539
+PLANTUML_IMG=plantuml/plantuml:1.2026.10@sha256:2cf2f097652701319e29b9e6a809e68d4ddb06fbeeb696705c097da8fa6d0507
+```
 
 On first use, look for the config file `.c4-diagrams.json` at the repo root. If it is
 missing, run the **setup flow** in [references/runtime-and-mcp.md](references/runtime-and-mcp.md):
@@ -129,13 +133,12 @@ repeat):
 
 See [references/runtime-and-mcp.md](references/runtime-and-mcp.md) for exact tool names and
 fallbacks. If Docker is present but MCP is not connected, use `validate` on the pinned image as
-the inner loop: it is the purpose-built parse check and writes no files. Give the user this exact
-command too, never a bare image name:
+the inner loop: it is the purpose-built parse check and writes no files. Give the user this command
+too, with the real `IMG` line filled in:
 
 ```bash
-docker run --rm -v "$PWD:/work" -w /work \
-  structurizr/structurizr:2026.10.26-playwright@sha256:77dc0c529d9bdf46a19da044d6a4f430369b8d85bf9142c1cfc3ed536de262c1 \
-  validate -workspace workspace.dsl
+IMG=…   # the IMG line from Pinned images, above
+docker run --rm -v "$PWD:/work" -w /work "$IMG" validate -workspace workspace.dsl
 ```
 
 A failed `export` (parser exception / non-zero exit) is the same signal when you were
