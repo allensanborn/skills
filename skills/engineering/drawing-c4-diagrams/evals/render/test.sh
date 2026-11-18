@@ -7,17 +7,22 @@
 # Needs Docker and network: pulls pinned images; the URL-theme cases fetch icons from GitHub.
 # Usage: bash evals/render/test.sh [output-dir]   render with Docker, then check (output kept when given)
 #        bash evals/render/test.sh --check DIR    check renders someone else made (the Dagger renderTest)
-# The pins below are mirrored in .dagger/src/index.ts; bump both together.
+# Image versions come from SKILL.md ("Pinned images"), plus MERMAID_IMG below; the Dagger
+# renderTest reads the same lines. Renovate bumps them.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-STRUCTURIZR=structurizr/structurizr:2026.10.26-playwright
-PLANTUML=plantuml/plantuml:1.2026.10
-MERMAID=minlag/mermaid-cli:12.0.0
-# Pinned to the structurizr/structurizr release tag matching $STRUCTURIZR, so upstream pushes cannot change results
-THEME_URL=https://raw.githubusercontent.com/structurizr/structurizr/v2026.10.26/structurizr-themes/amazon-web-services-2025.07/theme.json
+MERMAID_IMG=minlag/mermaid-cli:12.0.0@sha256:fa995339034aae7e5cd4f61482248b7f5c51be355b1a6f6eda11a2bbf8401f5f
 
 render() {
+  pin() { sed -nE "s/^$1=([^ ]+@sha256:[0-9a-f]{64})$/\1/p" "$HERE/../../SKILL.md"; }
+  STRUCTURIZR=$(pin IMG)
+  PLANTUML=$(pin PLANTUML_IMG)
+  : "${STRUCTURIZR:?IMG missing from SKILL.md}" "${PLANTUML:?PLANTUML_IMG missing from SKILL.md}"
+  # The theme release tag matching the image, so upstream pushes cannot change results.
+  local tag=${STRUCTURIZR#*:}; tag=${tag%%[-@]*}
+  THEME_URL=https://raw.githubusercontent.com/structurizr/structurizr/v$tag/structurizr-themes/amazon-web-services-2025.07/theme.json
+
   mkdir -p "$WORK"
   cp "$HERE/aws-deployment.dsl" "$WORK/installed.dsl"
   sed "s#theme amazon-web-services-2025.07#theme $THEME_URL#" "$HERE/aws-deployment.dsl" >"$WORK/url.dsl"
@@ -32,7 +37,7 @@ render() {
   structurizr export -workspace url.dsl -format plantuml/c4plantuml -output url/c4plantuml
   structurizr export -workspace url.dsl -format mermaid -output url/mermaid
   dockerq "$PLANTUML" -tsvg url/plantuml/structurizr-Deployment.puml
-  dockerq -u "$(id -u):$(id -g)" -e HOME=/tmp "$MERMAID" -i url/mermaid/structurizr-Deployment.mmd -o url/mermaid/structurizr-Deployment.svg
+  dockerq -u "$(id -u):$(id -g)" -e HOME=/tmp "$MERMAID_IMG" -i url/mermaid/structurizr-Deployment.mmd -o url/mermaid/structurizr-Deployment.svg
 }
 
 if [ "${1:-}" = "--check" ]; then

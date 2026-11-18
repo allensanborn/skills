@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["custom.regex"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Docker images defined once as NAME_IMG=image:tag@sha256:digest (Dependabot handles actions and npm)",
+      "managerFilePatterns": [
+        "/^skills/engineering/drawing-c4-diagrams/SKILL\\.md$/",
+        "/^skills/engineering/drawing-c4-diagrams/evals/render/test\\.sh$/"
+      ],
+      "matchStrings": [
+        "[A-Z_]*IMG=(?<depName>[a-z0-9./-]+):(?<currentValue>[A-Za-z0-9._-]+)@(?<currentDigest>sha256:[0-9a-f]{64})"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "minimumReleaseAge": "7 days",
+  "labels": ["dependencies"]
+}

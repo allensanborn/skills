@@ -115,21 +115,21 @@ Render one view per level. `include *` pulls in the relevant elements; always se
 views {
     systemContext bank "SystemContext" "The big picture." {
         include *
-        autolayout lr
+        autolayout tb
     }
     container bank "Containers" {
         include *
-        autolayout lr
+        autolayout tb
     }
     component api "Components" {
         include *
-        autolayout lr
+        autolayout tb
     }
     dynamic bank "SignIn" "How a user signs in." {
         user -> spa "Enters credentials"
         spa -> api "Validates credentials"
         api -> db "Looks up user"
-        autolayout lr
+        autolayout tb
     }
 }
 ```
@@ -157,7 +157,7 @@ Deployment views map container **instances** onto infrastructure:
 ```text
     deployment bank "Live" "LiveDeployment" {
         include *
-        autolayout lr
+        autolayout tb
     }
 ```
 
@@ -222,19 +222,29 @@ also **required** for `generate system-landscape` (the rollup is what the genera
 from a base by tag. Two hard limits make them a poor fit for committed images:
 
 - the **base view must use manual layout**: `autolayout` on a filtered view's base is rejected;
-- the **headless export silently skips filtered views**: only the base is written
-  ([runtime-and-mcp.md](runtime-and-mcp.md)).
+- **headless export writes only one of the pair**: PlantUML/Mermaid write the base and skip the
+  filtered view, PNG/SVG write the filtered view and skip the base (verified on
+  `2026.10.26-playwright`, 2026-11-18).
 
 So for repo images, author a "clean" and a "full" view **explicitly** (one `include *`, one that
 `exclude`s the noisy tag/element). Filtered views are fine only when the audience browses the
-live Structurizr server.
+live Structurizr server. **Perspectives** are the same story: an overlay in the Structurizr UI (the
+binoculars / `p` key) that no export draws.
 
-**Layout.** `autolayout <lr|rl|tb|bt> [rankSep] [nodeSep]`: e.g. `autolayout lr 300 150` widens
-spacing; `tb` often untangles a fan-in that `lr` crowds. But note the **image-source caveat**:
-PlantUML/Mermaid do their *own* layout on export, so `autolayout` mainly drives the interactive
-server, where vNext's upgraded Dagre routes arrows and labels noticeably better than Lite did.
-For a dense view, the fix is still **fewer edges** (exclude the cross-cutting ones), not layout
-knobs.
+**Layout.** `autolayout <tb|bt|lr|rl> [rankSep] [nodeSep]`. **Default to `tb`**: diagrams should
+grow taller, never wider, because a viewer shrinks a wide image to fit and the labels go with it,
+while a tall one just scrolls. `lr` is for the view you have measured and found narrower that way.
+Tight spacing (`autolayout tb 200 50`) is narrower than the default 300/300; wider spacing only
+makes it worse. The width budget and the fix order are in
+[diagram-review-checklist.md](diagram-review-checklist.md) (*Legibility at size*).
+
+**Never hand-tune the layout.** Nudging label offsets or dragging boxes is a treadmill that breaks
+on the next model change. When a view renders badly, fix its structure: **split** it into slices
+of one concern each (about 4-6 elements), **exclude** the cross-cutting externals and let the slices
+carry them, or **shorten** relationship labels and move the detail into prose.
+
+Only Structurizr's own renderer (the `-playwright` image's PNG/SVG export, or the local server)
+uses `autolayout`. PlantUML and Mermaid exports lay the view out themselves.
 
 **Verify before trusting a view.** A misscoped `include`/`exclude` can yield an **empty** view
 (0 elements) that renders as a blank box: a silent failure. Check the per-view element and
@@ -323,7 +333,7 @@ and the [themes](https://docs.structurizr.com/server/diagrams/themes) and
   `Elastic Container Service`, `Fargate`, `Lambda`, `Aurora`, `ElastiCache`,
   `Simple Storage Service`, `OpenSearch Service`, `Simple Queue Service`, `Simple Email Service`,
   `Cognito`. There is no Availability Zone tag. List a version's tags with
-  `docker run --rm --entrypoint cat structurizr/structurizr /usr/local/structurizr-themes/<name>/theme.json`.
+  `docker run --rm --entrypoint cat "$IMG" /usr/local/structurizr-themes/<name>/theme.json`.
 - **Icons go on the deployment view only**: tag `deploymentNode`s and `infrastructureNode`s, never
   the logical containers (an Aurora icon on the "Database" container conflates C4 levels).
 - Icons are inlined as base64 into the workspace, so PNG/SVG export embeds them. They appear in the

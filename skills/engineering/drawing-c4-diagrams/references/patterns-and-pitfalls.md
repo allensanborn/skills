@@ -38,7 +38,7 @@ worker   -> broker "Subscribes to OrderPlaced from" "Kafka"
 **Microservices.** Each service is a container; a shared broker or API gateway is also a
 container. Use [groups](#dsl-feature-patterns-from-the-cookbook) to cluster by
 team/domain. Beware the "too many boxes" pitfall: split into multiple container views (see
-[Crowded container view](#modeling-patterns-common-use-cases)) or use filtered views if it gets crowded.
+[Crowded container view](#modeling-patterns-common-use-cases)) if it gets crowded.
 
 **API gateway / BFF.** The gateway is a container that fronts other containers; label each
 edge with what it routes.
@@ -154,8 +154,8 @@ tag it `External` at the org level: you own it. Key moves:
   "outside the org"). Flat grey-for-everything-not-ours hides the platform-vs-third-party line.
 - **Keep the fan-in off the clean views.** Every system → platform is a hairball; `exclude` the
   platform elements from the landscape/context views and give the fan-in its own **star view**
-  (above). (`filtered` views are the "official" tool here but don't survive the headless export;
-  see [runtime-and-mcp.md](runtime-and-mcp.md).)
+  (above). (`filtered` views are the "official" tool here but don't export cleanly;
+  see [structurizr-dsl.md](structurizr-dsl.md).)
 - **Deployment view owns the physical story.** The collector's *topology* (sidecar / per-node agent /
   gateway) and physical facts the static model abstracts away (e.g. two logically-separate databases
   co-located on one instance) belong on a **deployment** view via `deploymentNode` /
@@ -193,7 +193,8 @@ too).
   (e.g. `Shop -> Observability`) instead of you hand-adding duplicate system-level edges that
   drift. Enable it deliberately, then define only the granular container-level edges.
 - **Filtered views**: derive a focused view by include/exclude on tags, instead of a new
-  model: good for "too many elements" on large systems.
+  model. Good in the live server; for committed images author explicit views instead
+  ([structurizr-dsl.md](structurizr-dsl.md), *Filtered views*).
 - **Element / relationship styles + themes**: style by tag (`element "Database" { shape cylinder }`);
   write base styles for the familiar look (`theme default` is dead); installed themes such as
   `amazon-web-services-2025.07` add provider icons to deployment views; keep styling consistent
@@ -224,7 +225,7 @@ Prefer these built-ins over hand-maintaining duplicate diagrams: one model, many
 - **External systems omitted**: if it's not owned but is depended on, show it (tagged
   external). "No external systems" is almost always wrong.
 - **Too many elements**: split into multiple views (request path vs per-store-group data views;
-  edge / data / async for deployment), use groups, or a filtered view. Check the width budget
+  edge / data / async for deployment) or use groups. Check the width budget
   in the review checklist rather than trusting the full-size render.
 - **Unexplained acronyms / generic names** ("business logic", "backend"): name the real
   responsibility.

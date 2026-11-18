@@ -11,7 +11,8 @@
   "scripts": {
     "changeset": "changeset",
     "version": "changeset version && node scripts/sync-plugin-version.mjs",
-    "check-plugin-version": "node scripts/sync-plugin-version.mjs --check"
+    "check-plugin-version": "node scripts/sync-plugin-version.mjs --check",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='scripts/*.mjs' --test-coverage-exclude='scripts/*.test.mjs' --test-coverage-lines=90 --test-coverage-branches=80 scripts/*.test.mjs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",

@@ -42,10 +42,28 @@ fi
 echo "==> plugin.json version matches package.json"
 node scripts/sync-plugin-version.mjs --check
 
+echo "==> script tests, with coverage floors (90% lines, 80% branches)"
+npm test --silent
+
 echo "==> skill-lint"
 # Validates SKILL.md name/description limits, allowed frontmatter fields,
 # one-level references, referenced-files-exist, <500 lines.
 npx --yes skill-lint ./skills
+
+echo "==> docker images: one digest-pinned definition each, commands use the variables"
+c4=skills/engineering/drawing-c4-diagrams
+images='structurizr/structurizr|structurizr/mcp|plantuml/plantuml|minlag/mermaid-cli'
+for def in IMG MCP_IMG PLANTUML_IMG; do
+  grep -qE "^$def=($images):[A-Za-z0-9._-]+@sha256:[0-9a-f]{64}$" "$c4/SKILL.md" \
+    || { echo "SKILL.md lacks a digest-pinned $def= line"; exit 1; }
+done
+# A version may appear only on an *IMG= definition line (Renovate updates exactly those).
+stray=$(grep -rnE "($images):[0-9]" "$c4" .dagger/src | grep -vE ':[0-9]+:[A-Z_]*IMG=' || true)
+if [ -n "$stray" ]; then echo "Versioned image outside an *IMG= line:"; echo "$stray"; exit 1; fi
+# Commands name the variable, not the image.
+bare=$(grep -rnE 'docker (run|pull)|--entrypoint|^[[:space:]]+[a-z]+/' "$c4/SKILL.md" "$c4/references" \
+  | grep -E "($images)" || true)
+if [ -n "$bare" ]; then echo "Command names an image instead of \$IMG / \$MCP_IMG / \$PLANTUML_IMG:"; echo "$bare"; exit 1; fi
 
 echo "==> reference link check (one level deep, files exist)"
 fail=0

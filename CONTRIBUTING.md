@@ -89,7 +89,7 @@ LLM evals run with Claude Code's own runner, with-skill against a no-skill basel
 judge. These are real, billed runs:
 
 ```bash
-claude plugin eval skills/engineering/drawing-c4-diagrams --no-publish --allow-tools Bash Write Edit \
+claude plugin eval skills/engineering/drawing-c4-diagrams --no-publish --scaffold --allow-tools Bash Write Edit \
   --output-dir /tmp/c4-evals --report /tmp/c4-evals/report.html \
   [--case drawing-c4-diagrams-13] [--runs 1] [--max-cost-usd 5]
 ```
@@ -97,6 +97,16 @@ claude plugin eval skills/engineering/drawing-c4-diagrams --no-publish --allow-t
 Keep results **outside** the skill folder: reports quote the eval agent's system prompt, which
 skill-lint flags as TOXIC, and a packaged skill would ship them. `--allow-tools` is needed for
 cases that render; `allowed_tools` in a case's `prompt.md` doesn't grant them by itself.
+`--scaffold` runs the `scaffold.sh` in cases 2 and 10, which copies their input file into the
+empty workspace. Case 15 resumes a saved conversation (`history.jsonl`, trimmed to the prompt and
+reply with no personal data); the runner leaves a session `.jsonl` beside it, which is gitignored. Docker is blocked inside the eval sandbox, so render graders accept an honest
+"couldn't render"; the rendering itself is tested by `dagger call render-test`.
+
+## Image bumps (Renovate)
+
+Each Docker image the skill runs is defined once, as an `*_IMG=image:tag@sha256:digest` line: three in `SKILL.md` ("Pinned images") and `MERMAID_IMG` in `evals/render/test.sh`. Everything else, including the Dagger module, reads those lines, and `ci/check.sh` fails on a version anywhere else. [Renovate](https://docs.renovatebot.com) watches only those lines (`renovate.json`); Dependabot keeps actions and npm. A bump PR arrives a week after an upstream release and is merged once `render-test` passes; add a patch changeset to it, since it changes what the skill runs.
+
+One-time setup, by the repo owner: install the [Renovate app](https://github.com/apps/renovate) on `allensanborn/skills` only.
 
 ## Release app
 

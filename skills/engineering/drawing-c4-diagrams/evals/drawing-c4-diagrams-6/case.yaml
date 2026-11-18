@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: drawing-c4-diagrams-6
 expected_outcome: |
-  Does NOT assume MCP; uses the headless path: `structurizr/structurizr export` (DSL -> PlantUML) then rasterise PlantUML -> PNG/SVG
-  Runs `validate` (or treats a failed export) as the validation signal; verifies each view is non-empty via the exported workspace.json counts
+  Does NOT assume MCP; uses the headless path: PNG/SVG export on the `structurizr/structurizr:<release>-playwright` image (preferred), or `export -format plantuml` then PlantUML -> PNG/SVG as the fallback
+  Runs `validate` (or treats a failed export) as the validation signal; verifies each view is non-empty via the exported workspace.json counts. Docker is blocked inside the `claude plugin eval` sandbox, so a run that attempts this with the correct command and then says plainly it could not render or verify (rather than claiming it did) also passes; the rendering itself is tested by `dagger call render-test`.
   Commits SVG for repo images (PNG only where SVG won't display), not Mermaid (Structurizr Mermaid uses HTML labels that render poorly on GitHub)

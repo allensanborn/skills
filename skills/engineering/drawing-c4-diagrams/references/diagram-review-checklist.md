@@ -138,7 +138,7 @@ Structurizr ships an enumerated model lint ([docs](https://docs.structurizr.com/
 **Run it locally (no server, no license):**
 
 ```bash
-docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work structurizr/structurizr inspect -workspace <workspace.dsl>
+docker run --rm -e STRUCTURIZR_THEMES=/usr/local/structurizr-themes -v "$PWD:/work" -w /work "$IMG" inspect -workspace <workspace.dsl>
 ```
 
 It reports (all default to `error`; tune to `warning` / `info` / `ignore`):
