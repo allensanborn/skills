@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Allen Sanborn
 /**
  * Quality gates for the skills collection.
  *
@@ -7,6 +9,7 @@
  *   dagger call vale --source=.
  *   dagger call gitleaks --source=.
  *   dagger call zizmor --source=.
+ *   dagger call skill-scanner --source=.
  */
 import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 
@@ -20,6 +23,7 @@ const MARKDOWNLINT = "davidanson/markdownlint-cli2:v0.24.0"
 const VALE = "jdkato/vale:v3.25.0"
 const GITLEAKS = "zricethezav/gitleaks:v8.30.1"
 const ZIZMOR = "1.32.0"
+const SKILL_SCANNER = "2.3.2"
 const RENDER = "skills/engineering/drawing-c4-diagrams/evals/render"
 
 @object()
@@ -91,6 +95,21 @@ export class Skills {
       .withDirectory("/src/.github", source.directory(".github"))
       .withWorkdir("/src")
       .withExec(["zizmor", "--offline", "--min-severity", "low", "."])
+      .stdout()
+  }
+
+  /**
+   * Cisco skill-scanner (static + behavioral, no LLM) over every skill; fails on high or critical.
+   * A signal, not proof: its own published recall for rules alone is low.
+   */
+  @func()
+  async skillScanner(source: Directory): Promise<string> {
+    return dag
+      .container()
+      .from("python:3.13-slim")
+      .withExec(["pip", "install", "--no-cache-dir", "--root-user-action=ignore", `cisco-ai-skill-scanner==${SKILL_SCANNER}`])
+      .withDirectory("/src/skills", source.directory("skills"))
+      .withExec(["skill-scanner", "scan-all", "/src/skills", "--recursive", "--use-behavioral", "--fail-on-severity", "high"])
       .stdout()
   }
 

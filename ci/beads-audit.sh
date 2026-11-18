@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Allen Sanborn
 #
 # Audit a beads repo against the desired state. Run with no args in a repo, or pass paths.
 # Exits non-zero if any repo has a problem, so it works in CI or a pre-flight check.

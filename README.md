@@ -19,6 +19,15 @@ claude plugin install allensanborn-skills@allensanborn
 
 Updates when a new version is released.
 
+To stay on a release you've reviewed instead, add the marketplace at its tag. Releases are immutable, so the tag can't be moved to other code:
+
+```bash
+claude plugin marketplace add allensanborn/skills@v0.2.0
+claude plugin install allensanborn-skills@allensanborn
+```
+
+To move to a newer release, run `claude plugin marketplace remove allensanborn` and add it again at the new tag. Removing the marketplace also uninstalls the plugin, so reinstall it after.
+
 </details>
 
 <details>

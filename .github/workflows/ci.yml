@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        check: [lint, markdownlint, vale, gitleaks, zizmor, render-test]
+        check: [lint, markdownlint, vale, gitleaks, zizmor, skill-scanner, render-test]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

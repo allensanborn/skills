@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Allen Sanborn
 # Portable quality checks for the skills collection.
 # Run locally (`bash ci/check.sh`) or from the Dagger module in .dagger/.
 # Intentionally dependency-light: only needs bash + npx (Node).

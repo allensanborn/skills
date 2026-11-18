@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Allen Sanborn
 # Dev-only: symlink every skill in this repo into the local skill directories, so edits
 # are live in the next session and `git pull` is the only update step.
 #   ~/.claude/skills  (Claude Code)

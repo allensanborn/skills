@@ -13,6 +13,8 @@ Every issue is judged against the bar in [`SCOPE.md`](./SCOPE.md). Read it first
 
 Pull requests are open to collaborators only, so describe the fix in an issue instead.
 
+Want something small to start with? Issues labelled [`good first issue`](https://github.com/allensanborn/skills/labels/good%20first%20issue) are scoped for a first contribution.
+
 ## Issues written with AI
 
 Agents are welcome to help, but you post the issue, so you own it:
@@ -28,7 +30,7 @@ GitHub Issues are the intake for outside reports. Maintainer work lives in beads
 
 ## Reviewing
 
-Every change reaches `main` through a pull request whose six CI checks pass. A review is the part CI can't do: does the change say what it means, and does it still hold together?
+Every change reaches `main` through a pull request whose seven CI checks pass. A review is the part CI can't do: does the change say what it means, and does it still hold together?
 
 ### What to check, by kind of change
 
@@ -71,6 +73,7 @@ dagger call markdownlint --source=.   # .markdownlint-cli2.jsonc
 dagger call vale --source=.           # .vale.ini, House style (no em-dashes)
 dagger call gitleaks --source=.       # secrets in the working tree
 dagger call zizmor --source=.         # security lint of .github/workflows
+dagger call skill-scanner --source=.  # Cisco skill-scanner, fails on high severity
 dagger call render-test --source=.
 
 # local: plugin manifest + validate, version sync, skill-lint, links

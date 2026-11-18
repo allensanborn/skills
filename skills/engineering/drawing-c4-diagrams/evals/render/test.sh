@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Allen Sanborn
 # Render test: AWS icon theme through every Structurizr export path.
 # Asserts today's behaviour -- what works AND what doesn't -- so an upstream change fails here
 # and the docs (references/structurizr-dsl.md, "Icons outside the Structurizr renderer") get updated.
